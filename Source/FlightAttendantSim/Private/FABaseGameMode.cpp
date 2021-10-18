@@ -13,9 +13,9 @@ UDocsInfoStruct* AFABaseGameMode::GetRandomDoc() const
 	if (LastNames.Num() == 0 || FirstNames.Num() == 0 || Nationalities.Num() == 0)
 		return NULL;
 	const int32 PassengerId = FMath::RandRange(MinPassengerIdBound, MaxPassengerIdBound);
-	const std::string LastName = LastNames[FMath::RandRange(0, LastNames.Num() - 1)];
-	const std::string FirstName = FirstNames[FMath::RandRange(0, FirstNames.Num() - 1)];
-	const std::string Nationality = Nationalities[FMath::RandRange(0, Nationalities.Num() - 1)];
+	const FString LastName = LastNames[FMath::RandRange(0, LastNames.Num() - 1)];
+	const FString FirstName = FirstNames[FMath::RandRange(0, FirstNames.Num() - 1)];
+	const FString Nationality = Nationalities[FMath::RandRange(0, Nationalities.Num() - 1)];
 	return UDocsInfoStruct::CreateInstance(
 		PassengerId,
 		LastName,

@@ -31,12 +31,12 @@ protected:
 
 	//UPROPERTY()
 	TArray<UDocsInfoStruct*> DocsContainer;
-	//UPROPERTY()
-	TArray<std::string> LastNames;
-	//UPROPERTY()
-	TArray<std::string> FirstNames;
-	//UPROPERTY()
-	TArray<std::string> Nationalities;
+	UPROPERTY()
+	TArray<FString> LastNames;
+	UPROPERTY()
+	TArray<FString> FirstNames;
+	UPROPERTY()
+	TArray<FString> Nationalities;
 	UPROPERTY(EditDefaultsOnly, Category = "FilePaths")
 	FString PathToPassengersDocs;
 	UPROPERTY(EditDefaultsOnly, Category = "FilePaths")
