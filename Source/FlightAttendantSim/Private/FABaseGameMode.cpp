@@ -3,6 +3,7 @@
 
 #include "FABaseGameMode.h"
 #include "DocsInfoStruct.h"
+#include "TicketInfoStruct.h"
 
 AFABaseGameMode::AFABaseGameMode() 
 {
@@ -26,18 +27,66 @@ UDocsInfoStruct* AFABaseGameMode::GetRandomDoc() const
 		);
 }
 
+UTicketInfoStruct* AFABaseGameMode::GetRandomTicket(const FString& SeatTitle) const
+{
+	if (LastNames.Num() == 0 || FirstNames.Num() == 0) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to generate random ticket. No info in LastNames, FirstNames or SeatTitles."));
+		return NULL;
+	}
+	const int32 PassengerId = FMath::RandRange(MinPassengerIdBound, MaxPassengerIdBound);
+	const FString LastName = LastNames[FMath::RandRange(0, LastNames.Num() - 1)];
+	const FString FirstName = FirstNames[FMath::RandRange(0, FirstNames.Num() - 1)];
+	return UTicketInfoStruct::CreateInstance(
+		PassengerId,
+		LastName,
+		FirstName,
+		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+		SeatTitle
+	);
+}
+
 void AFABaseGameMode::InitDocuments()
 {
-	//DocsContainer = UDocsInfoStruct::LoadUsingFileHelper(TCHAR_TO_UTF8(*PathToPassengersDocs));
+	DocsContainer = UDocsInfoStruct::LoadUsingFileHelper(TCHAR_TO_UTF8(*PathToPassengersDocs));
 	LastNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToLastNames));
 	FirstNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToFirstNames));
 	Nationalities = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToNationalities));
+	TicketsContainer = GenerateTickets(SeatsCount);
+	PassportsContainer = GeneratePassports(TicketsContainer);
+}
+
+TArray<UTicketInfoStruct*> AFABaseGameMode::GenerateTickets(int32 Count) const
+{
+	UTicketInfoStruct** RawArray = new UTicketInfoStruct*[Count];
+	for (int i = 0; i < Count; ++i)
+		RawArray[i] = GetRandomTicket(SeatTitles[i]);
+	return TArray<UTicketInfoStruct*>(RawArray, Count);
+}
+
+TArray<UDocsInfoStruct*> AFABaseGameMode::GeneratePassports(
+	const TArray<UTicketInfoStruct*>& TicketsList) const
+{
+	int32 Count = TicketsList.Num();
+	UDocsInfoStruct** Passports = new UDocsInfoStruct*[Count];
+	for (int i = 0; i < Count; ++i) 
+	{
+		Passports[i] = UDocsInfoStruct::CreateInstance(
+			TicketsList[i]->GetPassengerId(),
+			TicketsList[i]->GetLastName(),
+			TicketsList[i]->GetFirstName(),
+			GetRandomNationality(),
+			UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+			UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill)
+			);
+	}
+	return TArray<UDocsInfoStruct*>(Passports, Count);
 }
 
 void AFABaseGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	UE_LOG(LogTemp, Display, TEXT("Docs inited"));
-	//DocsContainer = UDocsInfoStruct::Load(TCHAR_TO_UTF8(*PathToPassengersDocs));
 	InitDocuments();
+	UE_LOG(LogTemp, Display, TEXT("Docs inited"));
 }

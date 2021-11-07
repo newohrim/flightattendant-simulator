@@ -134,7 +134,7 @@ TArray<UDocsInfoStruct*> UDocsInfoStruct::ParsePassengersInfo(std::string FileCo
 		getline(linestream, parts[count++]);
 
 		UDocsInfoStruct* created_doc = NewObject<UDocsInfoStruct>(UDocsInfoStruct::StaticClass());
-		created_doc->PassengerId = std::stoull(parts[0]);
+		created_doc->PassengerId = std::stoi(parts[0]);
 		created_doc->LastName = FString(parts[1].c_str());
 		created_doc->FirstName = FString(parts[2].c_str());
 		created_doc->Nationality = FString(parts[3].c_str());

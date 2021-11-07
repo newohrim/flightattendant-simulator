@@ -3,7 +3,8 @@
 #include "DocsInfoStruct.generated.h"
 
 #pragma once
-UCLASS()
+
+UCLASS(BlueprintType)
 class FLIGHTATTENDANTSIM_API UDocsInfoStruct : public UObject
 {
 	GENERATED_BODY()
@@ -23,7 +24,7 @@ public:
 		const FString& ExpirationDate);
 	// uint64 is not supported by Blueprint
 	UFUNCTION(BlueprintCallable)
-	int32 GetPassengerId() const { return (int32)PassengerId; }
+	int32 GetPassengerId() const { return PassengerId; }
 	UFUNCTION(BlueprintCallable)
 	FString GetLastName() const { return LastName; }
 	UFUNCTION(BlueprintCallable)
@@ -35,17 +36,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetExpirationDate() const { return ExpirationDate; }
 
-private:
+protected:
 	const static int ColumnsCount = 6;
 
-	uint64 PassengerId = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
+	int32 PassengerId = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
 	FString LastName = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
 	FString FirstName = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
 	FString Nationality = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
 	FString BirthDate = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DocsInfo");
 	FString ExpirationDate = "";
 
 	static TArray<UDocsInfoStruct*> ParsePassengersInfo(std::string FileContent);
 	static TArray<FString> ParseStringFile(std::string FileContent);
 };
-
