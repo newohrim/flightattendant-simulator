@@ -22,6 +22,8 @@ public:
 		const FString& Nationality,
 		const FString& BirthDate,
 		const FString& ExpirationDate);
+	UFUNCTION(BlueprintCallable)
+	static UDocsInfoStruct* CopyInstance(const UDocsInfoStruct* OriginalInstance);
 	// uint64 is not supported by Blueprint
 	UFUNCTION(BlueprintCallable)
 	int32 GetPassengerId() const { return PassengerId; }

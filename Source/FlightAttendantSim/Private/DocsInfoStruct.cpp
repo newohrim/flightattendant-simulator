@@ -119,6 +119,17 @@ UDocsInfoStruct* UDocsInfoStruct::CreateInstance(
 	return CreatedInstance;
 }
 
+UDocsInfoStruct* UDocsInfoStruct::CopyInstance(const UDocsInfoStruct* OriginalInstance)
+{
+	return UDocsInfoStruct::CreateInstance(
+		OriginalInstance->GetPassengerId(),
+		OriginalInstance->GetLastName(),
+		OriginalInstance->GetFirstName(),
+		OriginalInstance->GetNationality(),
+		OriginalInstance->GetBirthDate(),
+		OriginalInstance->GetExpirationDate());
+}
+
 TArray<UDocsInfoStruct*> UDocsInfoStruct::ParsePassengersInfo(std::string FileContent)
 {
 	TArray<UDocsInfoStruct*> result;

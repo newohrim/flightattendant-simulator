@@ -19,3 +19,14 @@ UTicketInfoStruct* UTicketInfoStruct::CreateInstance(
 	CreatedInstance->Seat = Seat;
 	return CreatedInstance;
 }
+
+UTicketInfoStruct* UTicketInfoStruct::CopyInstance(const UTicketInfoStruct* OriginalInstance)
+{
+	return UTicketInfoStruct::CreateInstance(
+		OriginalInstance->GetPassengerId(),
+		OriginalInstance->GetLastName(),
+		OriginalInstance->GetFirstName(),
+		OriginalInstance->GetDepartureDate(),
+		OriginalInstance->GetDepartureTime(),
+		OriginalInstance->GetSeatTitle());
+}

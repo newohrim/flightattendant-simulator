@@ -22,6 +22,8 @@ public:
 		const FString& DepartureDate,
 		const FString& DepartureTime,
 		const FString& Seat);
+	UFUNCTION(BlueprintCallable)
+	static UTicketInfoStruct* CopyInstance(const UTicketInfoStruct* OriginalInstance);
 	//static FString GenerateSeatNumber(int32 Min, int);
 	UFUNCTION(BlueprintCallable)
 	int32 GetPassengerId() const { return PassengerId; }
