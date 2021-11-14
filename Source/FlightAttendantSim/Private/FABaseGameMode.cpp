@@ -9,6 +9,13 @@ AFABaseGameMode::AFABaseGameMode()
 {
 }
 
+FString AFABaseGameMode::BuildDepartureTimeString(int32 Hours, int32 Minutes)
+{
+	return FString::FromInt(Hours)
+		.AppendChar(':')
+		.Append(Minutes > 9 ? FString::FromInt(Minutes) : FString("0").Append(FString::FromInt(Minutes)));
+}
+
 UDocsInfoStruct* AFABaseGameMode::GetRandomDoc() const
 {
 	if (LastNames.Num() == 0 || FirstNames.Num() == 0 || Nationalities.Num() == 0)
@@ -42,13 +49,14 @@ UTicketInfoStruct* AFABaseGameMode::GetRandomTicket(const FString& SeatTitle) co
 		LastName,
 		FirstName,
 		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
-		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+		FlightDepartureTime,
 		SeatTitle
 	);
 }
 
 void AFABaseGameMode::InitDocuments()
 {
+	FlightDepartureTime = BuildDepartureTimeString(FlightDepartureTimeHours, FlightDepartureTimeMinutes);
 	DocsContainer = UDocsInfoStruct::LoadUsingFileHelper(TCHAR_TO_UTF8(*PathToPassengersDocs));
 	LastNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToLastNames));
 	FirstNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToFirstNames));

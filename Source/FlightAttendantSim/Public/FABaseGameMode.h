@@ -19,6 +19,9 @@ public:
 	AFABaseGameMode();
 
 	UFUNCTION(BlueprintCallable)
+	static FString BuildDepartureTimeString(int32 Hours, int32 Minutes);
+
+	UFUNCTION(BlueprintCallable)
 	UDocsInfoStruct* GetRandomDoc() const;
 	UFUNCTION(BlueprintCallable)
 	UTicketInfoStruct* GetRandomTicket(const FString& SeatTitle) const;
@@ -26,6 +29,12 @@ public:
 	TArray<UTicketInfoStruct*> GetTicketsList() const { return TicketsContainer; }
 	UFUNCTION(BlueprintCallable)
 	TArray<UDocsInfoStruct*> GetPassportsList() const { return PassportsContainer; }
+	UFUNCTION(BlueprintCallable)
+	int32 GetFlightDepartureTimeHours() const { return FlightDepartureTimeHours; }
+	UFUNCTION(BlueprintCallable)
+	int32 GetFlightDepartureTimeMinutes() const { return FlightDepartureTimeHours; }
+	UFUNCTION(BlueprintCallable)
+	FString GetFlightDepartureTime() const { return FlightDepartureTime; }
 	UFUNCTION(BlueprintCallable)
 	void InitDocuments();
 	UFUNCTION(BlueprintCallable)
@@ -71,4 +80,12 @@ protected:
 	int32 GenerateDateYearFrom;
 	UPROPERTY(EditDefaultsOnly, Category = "PassengersInfo")
 	int32 GenerateDateYearTill;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
+	int32 FlightDepartureTimeHours;
+	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
+	int32 FlightDepartureTimeMinutes;
+
+private:
+	FString FlightDepartureTime;
 };
