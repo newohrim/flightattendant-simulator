@@ -81,6 +81,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PassengersInfo")
 	int32 GenerateDateYearTill;
 	
+
 	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
 	int32 FlightDepartureTimeHours;
 	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
