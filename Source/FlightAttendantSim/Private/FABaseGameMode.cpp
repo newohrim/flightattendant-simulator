@@ -16,6 +16,15 @@ FString AFABaseGameMode::BuildDepartureTimeString(int32 Hours, int32 Minutes)
 		.Append(Minutes > 9 ? FString::FromInt(Minutes) : FString("0").Append(FString::FromInt(Minutes)));
 }
 
+FString AFABaseGameMode::BuildDepartureDateString(int32 Day, int32 Month, int32 Year)
+{
+	return FString::FromInt(Day)
+		.AppendChar('.')
+		.Append(Month > 9 ? FString::FromInt(Month) : FString("0").Append(FString::FromInt(Month)))
+		.AppendChar('.')
+		.Append(FString::FromInt(Year));
+}
+
 UDocsInfoStruct* AFABaseGameMode::GetRandomDoc() const
 {
 	if (LastNames.Num() == 0 || FirstNames.Num() == 0 || Nationalities.Num() == 0)
@@ -30,8 +39,9 @@ UDocsInfoStruct* AFABaseGameMode::GetRandomDoc() const
 		FirstName,
 		Nationality,
 		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
-		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill)
-		);
+		//UDocsInfoStruct::GenerateRandomDate(FlightDepartureDateYear - 6, FlightDepartureDateYear)
+		UDocsInfoStruct::AddDaysToDate(FlightDepartureDate, FMath::RandRange(1, 720))
+	);
 }
 
 UTicketInfoStruct* AFABaseGameMode::GetRandomTicket(const FString& SeatTitle) const
@@ -48,7 +58,8 @@ UTicketInfoStruct* AFABaseGameMode::GetRandomTicket(const FString& SeatTitle) co
 		PassengerId,
 		LastName,
 		FirstName,
-		UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+		//UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
+		FlightDepartureDate,
 		FlightDepartureTime,
 		SeatTitle
 	);
@@ -57,6 +68,7 @@ UTicketInfoStruct* AFABaseGameMode::GetRandomTicket(const FString& SeatTitle) co
 void AFABaseGameMode::InitDocuments()
 {
 	FlightDepartureTime = BuildDepartureTimeString(FlightDepartureTimeHours, FlightDepartureTimeMinutes);
+	FlightDepartureDate = BuildDepartureDateString(FlightDepartureDateDay, FlightDepartureDateMonth, FlightDepartureDateYear);
 	DocsContainer = UDocsInfoStruct::LoadUsingFileHelper(TCHAR_TO_UTF8(*PathToPassengersDocs));
 	LastNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToLastNames));
 	FirstNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToFirstNames));
@@ -86,7 +98,8 @@ TArray<UDocsInfoStruct*> AFABaseGameMode::GeneratePassports(
 			TicketsList[i]->GetFirstName(),
 			GetRandomNationality(),
 			UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill),
-			UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill)
+			//UDocsInfoStruct::GenerateRandomDate(GenerateDateYearFrom, GenerateDateYearTill)
+			UDocsInfoStruct::AddDaysToDate(FlightDepartureDate, FMath::RandRange(1, 720))
 			);
 	}
 	return TArray<UDocsInfoStruct*>(Passports, Count);

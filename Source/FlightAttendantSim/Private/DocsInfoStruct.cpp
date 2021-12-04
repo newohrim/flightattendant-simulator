@@ -93,10 +93,65 @@ TArray<FString> UDocsInfoStruct::LoadUsingFileHelperStrings(const char* PathToPa
 
 FString UDocsInfoStruct::GenerateRandomDate(int32 YearFrom, int32 YearTill)
 {
+	return GenerateRandomDateExtended(1, 30, 1, 12, YearFrom, YearTill);
+}
+
+FString UDocsInfoStruct::GenerateRandomDateExtended(int32 DayFrom, int32 DayTill, int32 MonthFrom, int32 MonthTill, int32 YearFrom, int32 YearTill)
+{
 	std::stringstream date;
-	date << FMath::RandRange(1, 30) << '.' 
-		<< FMath::RandRange(1, 12) << '.' 
+	date << FMath::RandRange(DayFrom, DayTill) << '.'
+		<< FMath::RandRange(MonthFrom, MonthTill) << '.'
 		<< FMath::RandRange(YearFrom, YearTill);
+	return FString(date.str().c_str());
+}
+
+FString UDocsInfoStruct::AddDaysToDate(const FString& Date, int32 Days)
+{
+	FString DayStr;
+	FString MonthStr;
+	FString YearStr;
+	FString Temp;
+	check(Date.Split(".", &DayStr, &Temp));
+	check(Temp.Split(".", &MonthStr, &YearStr));
+	int32 Day = FCString::Atoi(*DayStr) + Days;
+	int32 Month = FCString::Atoi(*MonthStr);
+	int32 Year = FCString::Atoi(*YearStr);
+	while (Day > 30) 
+	{
+		++Month;
+		if (Month > 12) 
+		{
+			++Year;
+			Month = 1;
+		}
+		Day -= 30;
+	}
+	while (Day < 0) 
+	{
+		--Month;
+		if (Month < 1) 
+		{
+			Month = 12;
+			--Year;
+		}
+		Day += 30;
+	}
+	return FString::FromInt(Day)
+		.AppendChar('.')
+		.Append(Month > 9 ? FString::FromInt(Month) : FString("0").Append(FString::FromInt(Month)))
+		.AppendChar('.')
+		.Append(FString::FromInt(Year));
+}
+
+FString UDocsInfoStruct::GenerateRandomTime()
+{
+	int32 Hours = FMath::RandRange(0, 23);
+	int32 Minutes = FMath::RandRange(0, 59);
+	std::stringstream date;
+	date << Hours << ':';
+	if (Minutes <= 9)
+		date << '0';
+	date << Minutes;
 	return FString(date.str().c_str());
 }
 

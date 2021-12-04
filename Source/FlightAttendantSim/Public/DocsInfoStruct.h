@@ -14,7 +14,15 @@ public:
 	static TArray<UDocsInfoStruct*> Load(const char* PathToPassengersInfo);
 	static TArray<UDocsInfoStruct*> LoadUsingFileHelper(const char* PathToPassengersInfo);
 	static TArray<FString> LoadUsingFileHelperStrings(const char* PathToPassengersInfo);
+	// Different names because unreal doesn't support similar names with BlueprintCallable annotation
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FString GenerateRandomDate(int32 YearFrom, int32 YearTill);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GenerateRandomDateExtended(int32 DayFrom, int32 DayTill, int32 MonthFrom, int32 MonthTill, int32 YearFrom, int32 YearTill);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString AddDaysToDate(const FString& Date, int32 Days);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString GenerateRandomTime();
 	static UDocsInfoStruct* CreateInstance(
 		const uint64 PassengerId, 
 		const FString& LastName,

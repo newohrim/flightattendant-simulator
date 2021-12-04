@@ -20,6 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static FString BuildDepartureTimeString(int32 Hours, int32 Minutes);
+	UFUNCTION(BlueprintCallable)
+	static FString BuildDepartureDateString(int32 Day, int32 Month, int32 Year);
 
 	UFUNCTION(BlueprintCallable)
 	UDocsInfoStruct* GetRandomDoc() const;
@@ -35,6 +37,8 @@ public:
 	int32 GetFlightDepartureTimeMinutes() const { return FlightDepartureTimeHours; }
 	UFUNCTION(BlueprintCallable)
 	FString GetFlightDepartureTime() const { return FlightDepartureTime; }
+	UFUNCTION(BlueprintCallable)
+	FString GetFlightDepartureDate() const { return FlightDepartureDate; }
 	UFUNCTION(BlueprintCallable)
 	void InitDocuments();
 	UFUNCTION(BlueprintCallable)
@@ -86,7 +90,14 @@ protected:
 	int32 FlightDepartureTimeHours;
 	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
 	int32 FlightDepartureTimeMinutes;
+	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
+	int32 FlightDepartureDateDay;
+	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
+	int32 FlightDepartureDateMonth;
+	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
+	int32 FlightDepartureDateYear;
 
 private:
 	FString FlightDepartureTime;
+	FString FlightDepartureDate;
 };
