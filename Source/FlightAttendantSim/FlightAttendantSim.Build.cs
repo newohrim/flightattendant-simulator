@@ -12,7 +12,7 @@ public class FlightAttendantSim : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		PublicIncludePaths.AddRange(new string[] { "FlightAttendantSim/Public/Components" });
+		PublicIncludePaths.AddRange(new string[] { "FlightAttendantSim/Public/Components", "FlightAttendantSim/Public/Quests" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include <string>
+
+#include "Quest.h"
 #include "FABaseGameMode.generated.h"
 
 class UDocsInfoStruct;
@@ -96,6 +98,10 @@ protected:
 	int32 FlightDepartureDateMonth;
 	UPROPERTY(EditDefaultsOnly, Category = "FlightInfo")
 	int32 FlightDepartureDateYear;
+
+	// TEST
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UQuest> TestQuest;
 
 private:
 	FString FlightDepartureTime;
