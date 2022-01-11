@@ -30,6 +30,7 @@ class FLIGHTATTENDANTSIM_API UMapNode : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetDepth() const;
+	UFUNCTION(BlueprintCallable)
 	void GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum);
 	UFUNCTION(BlueprintCallable)
 	const TArray<UMapNode*>& GetChildNodes() const { return ChildNodes; }

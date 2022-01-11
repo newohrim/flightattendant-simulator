@@ -19,6 +19,7 @@ class FLIGHTATTENDANTSIM_API UMapGraph : public UObject
 public:
 	void GenerateMap(int32 Depth);
 	int32 GetCurrentDepth() const;
+	int32 GetGraphDepth() const;
 
 	UFUNCTION(BlueprintCallable)
 	UMapNode* GetRootNode() const { return RootNode; }
@@ -28,7 +29,7 @@ public:
 protected:
 	int32 MaxDepth = 10;
 	int32 MaxFacilitiesNum = 5;
-	int32 MaxChildrenNodesNum = 5;
+	int32 MaxChildrenNodesNum = 3;
 
 	UPROPERTY()
 	UMapNode* RootNode;
