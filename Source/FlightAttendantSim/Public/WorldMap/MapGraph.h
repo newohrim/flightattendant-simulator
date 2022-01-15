@@ -42,4 +42,10 @@ protected:
 
 private:
 	FBitmapHeight HeightMap;
+	TMap<TPair<int32, int32>, UMapNode*> BusyNodes;
+
+	void FixIntersections(const UMapNode* Node);
+	void FindIntersections(const UMapNode* Node, TArray<UMapNode*>& PositiveIntersections, TArray<UMapNode*>& NegativeIntersections) const;
+	UMapNode* FindCommonAncestor(TArray<UMapNode*> Intersections) const;
 };
+

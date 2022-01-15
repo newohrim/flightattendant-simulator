@@ -29,86 +29,70 @@ void UMapGraph::ExpandNode(UMapNode* Node)
 {
 	if (Node->GetChildNodes().Num() > 0)
 		return;
-	const int32 OriginalNodeDepth = Node->GetDepth();
-	Node->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum, OriginalNodeDepth + 1);
 
-	auto& ChildrenNodes = Node->GetChildNodes();
-	const int32 ChildCount = ChildrenNodes.Num();
-	const int32 OriginalNodeHeight = Node->GetHeightLevel();
-	const int32 MidIndex = ChildCount / 2;
-	const int32 OddOffset = ChildCount & 1;
-	// HeightLevels array is needed to search for intersections in HeightMap later
-	TArray<int32> HeightLevels;
-	if (OddOffset == 1)
-	{
-		// The middle node is always on the same level as the original one
-		ChildrenNodes[MidIndex]->SetHeightLevel(OriginalNodeHeight);
-		HeightLevels.Add(OriginalNodeHeight);
-	}
-	for (int32 i = MidIndex - 1; i >= 0; --i)
-	{
-		// Positive levels relative to the original node
-		int32 HeightLevel = OriginalNodeHeight + MidIndex - i;
-		ChildrenNodes[i]->SetHeightLevel(HeightLevel);
-		HeightLevels.Add(HeightLevel);
-	}
-	for (int32 i = MidIndex + OddOffset; i < ChildCount; ++i)
-	{
-		// Negative levels relative to the original node
-		int32 HeightLevel = OriginalNodeHeight + MidIndex - i - (OddOffset ^ 1);
-		ChildrenNodes[i]->SetHeightLevel(HeightLevel);
-		HeightLevels.Add(HeightLevel);
-	}
+	Node->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum, Node->GetDepth() + 1);
+	FixIntersections(Node);
+}
 
-	if (Node != RootNode)
-		Node->GetParentNode()->FixIntersections(HeightLevels, Node);
-
-	/*
-	const UMapNode* ParentNode = Node->GetParentNode();
-	auto& ParentNodeChildren = ParentNode->GetChildNodes();
-	int32 HigherNeighbourIndex = -1;
-	int32 LowerNeighbourIndex = ParentNodeChildren.Num();
-	// Height may change, so I need to iterate through all column to find neighbours of original node
-	for (int32 i = 0; i < ParentNodeChildren.Num(); ++i)
+void UMapGraph::FixIntersections(const UMapNode* Node)
+{
+	TArray<UMapNode*> PositiveIntersections, NegativeIntersections;
+	FindIntersections(Node, PositiveIntersections, NegativeIntersections);
+	if (PositiveIntersections.Num() > 0)
 	{
-		if (ParentNodeChildren[i] == Node)
+		UMapNode* CommonAncestor = FindCommonAncestor(PositiveIntersections);
+		CommonAncestor->UpdateHeightLevels(PositiveIntersections.Num());
+		// Check for new intersections
+		FixIntersections(CommonAncestor);
+	}
+	if (NegativeIntersections.Num() > 0)
+	{
+		UMapNode* CommonAncestor = FindCommonAncestor(NegativeIntersections);
+		CommonAncestor->UpdateHeightLevels(-NegativeIntersections.Num());
+		// Check for new intersections
+		FixIntersections(CommonAncestor);
+	}
+}
+
+void UMapGraph::FindIntersections(const UMapNode* Node, TArray<UMapNode*>& PositiveIntersections,
+                                  TArray<UMapNode*>& NegativeIntersections) const
+{
+	for (UMapNode* Child : Node->GetChildNodes())
+	{
+		const bool IsBusy = HeightMap.GetBit(Child->GetDepth(), Child->GetHeightLevel());
+		if (IsBusy)
 		{
-			HigherNeighbourIndex = i - 1;
-			LowerNeighbourIndex = i + 1;
-			break;
+			const int32 ParentHeight =
+				BusyNodes[TPair<int32, int32>(Child->GetDepth(), Child->GetHeightLevel())]->GetParentNode()->GetHeightLevel();
+			if (ParentHeight > Node->GetHeightLevel())
+			{
+				PositiveIntersections.Add(Child);
+			}
+			else
+			{
+				NegativeIntersections.Add(Child);
+			}
 		}
 	}
+}
+
+UMapNode* UMapGraph::FindCommonAncestor(TArray<UMapNode*> Intersections) const
+{
+	if (Intersections.Num() == 1)
+		return Intersections[0]->GetParentNode();
 	
-	if (HigherNeighbourIndex >= 0)
+	while (true)
 	{
-		int32 PositiveIntersectionsCount = 0;
-		for (UMapNode* ChildN : ParentNodeChildren[HigherNeighbourIndex])
+		bool Found = true;
+		UMapNode* CommonAncestor = Intersections[0]->GetParentNode();
+		Intersections[0] = Intersections[0]->GetParentNode();
+		for (int i = 1; i < Intersections.Num(); ++i)
 		{
-			for (int32 Height : HeightLevels)
-			{
-				if (ChildN->GetHeightLevel() == Height)
-				{
-					++PositiveIntersectionsCount;
-					break;
-				}
-			}
+			Intersections[i] = Intersections[i]->GetParentNode();
+			if (Intersections[i] != CommonAncestor)
+				Found = false;
 		}
-		ParentNodeChildren[HigherNeighbourIndex]->UpdateHeightLevels(PositiveIntersectionsCount);
+		if (Found)
+			return CommonAncestor;
 	}
-	if (LowerNeighbourIndex < ParentNodeChildren.Num())
-	{
-		int32 NegativeIntersectionsCount = 0;
-		for (UMapNode* ChildN : ParentNodeChildren[LowerNeighbourIndex])
-		{
-			for (int32 Height : HeightLevels)
-			{
-				if (ChildN->GetHeightLevel() == Height)
-				{
-					++NegativeIntersectionsCount;
-					break;
-				}
-			}
-		}
-		ParentNodeChildren[LowerNeighbourIndex]->UpdateHeightLevels(NegativeIntersectionsCount);
-	}*/
 }
