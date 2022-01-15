@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "WorldMap/BitmapHeight.h"
 #include "MapGraph.generated.h"
 
 class UMapNode;
@@ -26,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UMapNode* GetCurrentNode() const { return CurrentNode; }
 
+	UFUNCTION(BlueprintCallable)
+	void ExpandNode(UMapNode* Node);
+
 protected:
 	int32 MaxDepth = 10;
 	int32 MaxFacilitiesNum = 5;
@@ -35,4 +39,7 @@ protected:
 	UMapNode* RootNode;
 	UPROPERTY()
 	UMapNode* CurrentNode;
+
+private:
+	FBitmapHeight HeightMap;
 };

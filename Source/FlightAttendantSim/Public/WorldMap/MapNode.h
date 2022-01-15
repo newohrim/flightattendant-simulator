@@ -29,9 +29,26 @@ class FLIGHTATTENDANTSIM_API UMapNode : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable)
-	int32 GetDepth() const;
+	int32 GetHeightLevel() const { return HeightLevel; }
 	UFUNCTION(BlueprintCallable)
-	void GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum);
+	void SetHeightLevel(const int32 NewLevel) { HeightLevel = NewLevel; }
+	UFUNCTION(BlueprintCallable)
+	int32 GetGraphDepth() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetDepth() const { return Depth; }
+	UFUNCTION(BlueprintCallable)
+	void SetDepth(const int32 NewDepth) { Depth = NewDepth; }
+	UFUNCTION(BlueprintCallable)
+	UMapNode* GetParentNode() const { return ParentNode; }
+	UFUNCTION(BlueprintCallable)
+	void SetParentNode(UMapNode* NewParentNode) { ParentNode = NewParentNode; }
+
+	void FixIntersections(const TArray<int32>& HeightLevels, const UMapNode* NodeWithIntersections);
+	int32 CountIntersections(const TArray<int32>& HeightLevels, const UMapNode* Node);
+	void UpdateHeightLevels(int32 HeightIncrement);
+	
+	UFUNCTION(BlueprintCallable)
+	void GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum, const int32 NewDepth);
 	UFUNCTION(BlueprintCallable)
 	const TArray<UMapNode*>& GetChildNodes() const { return ChildNodes; }
 
@@ -40,6 +57,12 @@ protected:
 	TArray<UMapNode*> ChildNodes;
 	UPROPERTY(BlueprintReadOnly)
 	TArray<TEnumAsByte<EFacilityType>> Facilities;
+	UPROPERTY(BlueprintReadOnly)
+	UMapNode* ParentNode = nullptr;
 
 	UMapNode* GenerateNode(int32 FacilitiesNum);
+
+private:
+	int32 HeightLevel = 0;
+	int32 Depth = 0;
 };
