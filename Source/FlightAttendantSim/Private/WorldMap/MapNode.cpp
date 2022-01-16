@@ -17,16 +17,6 @@ int32 UMapNode::GetGraphDepth() const
 	return MaxDepth + 1;
 }
 
-void UMapNode::FixIntersections(const TArray<int32>& HeightLevels, const UMapNode* NodeWithIntersections)
-{
-	
-}
-
-int32 UMapNode::CountIntersections(const TArray<int32>& HeightLevels, const UMapNode* Node)
-{
-	
-}
-
 void UMapNode::UpdateHeightLevels(int32 HeightIncrement)
 {
 	HeightLevel += HeightIncrement;
@@ -34,6 +24,42 @@ void UMapNode::UpdateHeightLevels(int32 HeightIncrement)
 	for (UMapNode* CNode : ChildNodes)
 	{
 		CNode->UpdateHeightLevels(HeightIncrement);
+	}
+}
+
+void UMapNode::MakeGridLayout(int32& X)
+{
+	if (ChildNodes.Num() == 0)
+	{
+		SetHeightLevel(X++);
+		return;
+	}
+	
+	const int32 Mid = ChildNodes.Num() / 2;
+	for (int i = 0; i < ChildNodes.Num(); ++i)
+	{
+		if (i == Mid)
+		{
+			if ((ChildNodes.Num() & 1) == 1)
+				SetHeightLevel(X);
+			else
+				SetHeightLevel(X++);
+		}
+		ChildNodes[i]->MakeGridLayout(X);
+		//ChildNodes[i]->SetHeightLevel(X++);
+		//ChildNodes[i]->SetDepth(Y);
+	}
+}
+
+void UMapNode::GetConnectedPairs(TArray<FVector2D>& NodePairs) const
+{
+	for (UMapNode* Child : ChildNodes)
+	{
+		Child->GetConnectedPairs(NodePairs);
+		NodePairs.Add(
+			{static_cast<float>(GetDepth()), static_cast<float>(GetHeightLevel())});
+		NodePairs.Add(
+			{static_cast<float>(Child->GetDepth()), static_cast<float>(Child->GetHeightLevel())});
 	}
 }
 

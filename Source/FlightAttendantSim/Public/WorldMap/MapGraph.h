@@ -23,9 +23,15 @@ public:
 	int32 GetGraphDepth() const;
 
 	UFUNCTION(BlueprintCallable)
+	int32 GetCurrentMaxDepth() const { return CurrentMaxDepth; }
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurrentMaxHeight() const { return CurrentMaxHeight; }
+	UFUNCTION(BlueprintCallable)
 	UMapNode* GetRootNode() const { return RootNode; }
 	UFUNCTION(BlueprintCallable)
 	UMapNode* GetCurrentNode() const { return CurrentNode; }
+	UFUNCTION(BlueprintCallable)
+	const TArray<FVector2D>& GetNodesPairs() const { return NodesPairs; }
 
 	UFUNCTION(BlueprintCallable)
 	void ExpandNode(UMapNode* Node);
@@ -41,11 +47,9 @@ protected:
 	UMapNode* CurrentNode;
 
 private:
-	FBitmapHeight HeightMap;
-	TMap<TPair<int32, int32>, UMapNode*> BusyNodes;
-
-	void FixIntersections(const UMapNode* Node);
-	void FindIntersections(const UMapNode* Node, TArray<UMapNode*>& PositiveIntersections, TArray<UMapNode*>& NegativeIntersections) const;
-	UMapNode* FindCommonAncestor(TArray<UMapNode*> Intersections) const;
+	int32 CurrentMaxDepth = 0;
+	int32 CurrentMaxHeight = 0;
+    	
+	TArray<FVector2D> NodesPairs;
 };
 

@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "MapNode.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum EFacilityType
 {
 	Shop			UMETA(DisplayName = "Shop"),
@@ -43,9 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetParentNode(UMapNode* NewParentNode) { ParentNode = NewParentNode; }
 
-	void FixIntersections(const TArray<int32>& HeightLevels, const UMapNode* NodeWithIntersections);
-	int32 CountIntersections(const TArray<int32>& HeightLevels, const UMapNode* Node);
 	void UpdateHeightLevels(int32 HeightIncrement);
+	void MakeGridLayout(int32& X);
+	void GetConnectedPairs(TArray<FVector2D>& NodePairs) const;
 	
 	UFUNCTION(BlueprintCallable)
 	void GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum, const int32 NewDepth);
