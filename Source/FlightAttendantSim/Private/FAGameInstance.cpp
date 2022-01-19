@@ -2,6 +2,7 @@
 
 
 #include "FAGameInstance.h"
+#include "WorldMap/MapGraph.h"
 
 void UFAGameInstance::Init()
 {

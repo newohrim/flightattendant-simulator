@@ -2,6 +2,8 @@
 
 
 #include "Quests/Quest.h"
+#include "FAGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "Quests/QuestNode.h"
 
 void UQuest::Init_Implementation()
@@ -9,11 +11,27 @@ void UQuest::Init_Implementation()
 	// PLACEHOLDER
 }
 
+TArray<FString> UQuest::GetCurrentGoals() const
+{
+	return CurrentNode->GetNodeGoals();
+}
 
 void UQuest::TakeQuest()
 {
 	if (!CurrentNode || QuestStatus != EQuestStatus::Waiting)
 		return;
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(World);
+	if (!GameInstance)
+	{
+		return;
+	}
+	Cast<UFAGameInstance>(GameInstance)->AddTakenQuest(this);
 
 	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	QuestStatus = EQuestStatus::Taken;

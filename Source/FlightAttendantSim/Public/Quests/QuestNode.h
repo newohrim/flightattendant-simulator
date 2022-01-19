@@ -26,12 +26,12 @@ public:
 	void Init();
 	void CompleteNode(UQuestNode* NextNode);
 	UFUNCTION(BlueprintCallable)
-	void AddTransition(UQuestTransition* Transition);
+	UQuestTransition* AddTransition(const FString& QuestDescription, UQuestTransition* Transition = nullptr);
 	bool IsLast() const { return ChildTransitions.Num() == 0; }
-	UFUNCTION(BlueprintCallable)
-	UQuestTransition* CreateTransition();
+	TArray<FString> GetNodeGoals() const;
 
 protected:
+	UPROPERTY()
 	TArray<UQuestTransition*> ChildTransitions;
 };
 

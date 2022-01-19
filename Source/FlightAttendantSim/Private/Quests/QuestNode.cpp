@@ -17,13 +17,25 @@ void UQuestNode::CompleteNode(UQuestNode* NextNode)
 	NodeCompleted.ExecuteIfBound(NextNode);
 }
 
-void UQuestNode::AddTransition(UQuestTransition* Transition)
+UQuestTransition* UQuestNode::AddTransition(const FString& QuestDescription, UQuestTransition* Transition)
 {
+	if (!Transition)
+		Transition = NewObject<UQuestTransition>(this);
 	ChildTransitions.Add(Transition);
-	ChildTransitions.Last()->TransitionComplete.BindUObject(this, &UQuestNode::CompleteNode);
+	UQuestTransition* AddedTransition = ChildTransitions.Last();
+	AddedTransition->SetTransitionDescription(QuestDescription);
+	AddedTransition->TransitionComplete.BindUObject(this, &UQuestNode::CompleteNode);
+	
+	return Transition;
 }
 
-UQuestTransition* UQuestNode::CreateTransition()
+TArray<FString> UQuestNode::GetNodeGoals() const
 {
-	return NewObject<UQuestTransition>(this);
+	TArray<FString> Goals;
+	for (const UQuestTransition* Transition : ChildTransitions)
+	{
+		Goals.Add(Transition->GetTransitionDescription());
+	}
+	
+	return Goals;
 }

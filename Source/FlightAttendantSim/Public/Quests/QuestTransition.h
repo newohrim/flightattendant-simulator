@@ -27,6 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FString GetTransitionDescription() const { return TransitionDescription; }
 	UFUNCTION(BlueprintCallable)
+	void SetTransitionDescription( const FString& NewDescription ) { TransitionDescription = NewDescription; }
+	UFUNCTION(BlueprintCallable)
 	virtual void ExecuteTransition();
 	UFUNCTION(BlueprintCallable)
 	void SetTargetNode(UQuestNode* Node) { TargetNode = Node; }
