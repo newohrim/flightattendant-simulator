@@ -21,17 +21,7 @@ void UQuest::TakeQuest()
 	if (!CurrentNode || QuestStatus != EQuestStatus::Waiting)
 		return;
 
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return;
-	}
-	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(World);
-	if (!GameInstance)
-	{
-		return;
-	}
-	Cast<UFAGameInstance>(GameInstance)->AddTakenQuest(this);
+	GetFAGameInstance()->AddTakenQuest(this);
 
 	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	QuestStatus = EQuestStatus::Taken;
@@ -53,5 +43,21 @@ void UQuest::FinishQuest()
 {
 	QuestStatus = EQuestStatus::Completed;
 	CurrentNode->NodeCompleted.Unbind();
+	GetFAGameInstance()->RemoveFinishedQuest(this);
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Quest completed."));
+}
+
+UFAGameInstance* UQuest::GetFAGameInstance() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return nullptr;
+	}
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(World);
+	if (!GameInstance)
+	{
+		return nullptr;
+	}
+	return Cast<UFAGameInstance>(GameInstance);
 }

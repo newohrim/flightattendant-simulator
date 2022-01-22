@@ -8,6 +8,7 @@
 #include "Quest.generated.h"
 
 class UQuestNode;
+class UFAGameInstance;
 
 UENUM()
 enum EQuestStatus
@@ -54,4 +55,6 @@ protected:
 	FString QuestDescription;
 	UPROPERTY()
 	UQuestNode* CurrentNode;
+	
+	UFAGameInstance* GetFAGameInstance() const;
 };
