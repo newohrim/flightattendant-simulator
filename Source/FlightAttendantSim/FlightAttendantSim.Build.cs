@@ -8,11 +8,26 @@ public class FlightAttendantSim : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"AIModule",
+			"DlgSystem"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		PublicIncludePaths.AddRange(new string[] { "FlightAttendantSim/Public/Components", "FlightAttendantSim/Public/Quests" });
+		PublicIncludePaths.AddRange(new string[]
+		{
+			"FlightAttendantSim/Public/Components", 
+			"FlightAttendantSim/Public/Quests",
+			"FlightAttendantSim/Public/WorldMap",
+			"FlightAttendantSim/Public/Characters",
+			"FlightAttendantSim/Public/SpacePlane"
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

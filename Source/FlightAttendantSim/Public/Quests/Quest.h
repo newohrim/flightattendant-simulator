@@ -22,12 +22,13 @@ enum EQuestStatus
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType)
-class FLIGHTATTENDANTSIM_API UQuest : public UObject
+UCLASS(Blueprintable, BlueprintType, Abstract, EditInlineNew)
+class FLIGHTATTENDANTSIM_API UQuest : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	UQuest();
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EQuestStatus> QuestStatus = EQuestStatus::Waiting;
 
@@ -45,7 +46,15 @@ public:
 	void ChangeNode(UQuestNode* NextNode);
 	void FinishQuest();
 
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("Quest", GetFName());
+	}
+	
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TArray<AActor*> GetTargetActors(const TSubclassOf<AActor> ClassToLookFor) const;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestInfo")
 	FString QuestName;
 	// TODO: Create character abstraction with all info on how and where to spawn him and move the name there.

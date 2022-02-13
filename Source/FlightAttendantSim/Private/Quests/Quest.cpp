@@ -3,12 +3,18 @@
 
 #include "Quests/Quest.h"
 #include "FAGameInstance.h"
+#include "FAGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Quests/QuestNode.h"
 
 void UQuest::Init_Implementation()
 {
 	// PLACEHOLDER
+}
+
+UQuest::UQuest()
+{
+	UE_LOG(LogTemp, Display, TEXT("%s"), *GetFullName());
 }
 
 TArray<FString> UQuest::GetCurrentGoals() const
@@ -21,7 +27,10 @@ void UQuest::TakeQuest()
 	if (!CurrentNode || QuestStatus != EQuestStatus::Waiting)
 		return;
 
-	GetFAGameInstance()->AddTakenQuest(this);
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+	Cast<AFAGameMode>(World->GetAuthGameMode())->AddTakenQuest(this);
 
 	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	QuestStatus = EQuestStatus::Taken;
@@ -43,8 +52,18 @@ void UQuest::FinishQuest()
 {
 	QuestStatus = EQuestStatus::Completed;
 	CurrentNode->NodeCompleted.Unbind();
-	GetFAGameInstance()->RemoveFinishedQuest(this);
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+	Cast<AFAGameMode>(World->GetAuthGameMode())->RemoveFinishedQuest(this);
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Quest completed."));
+}
+
+TArray<AActor*> UQuest::GetTargetActors(const TSubclassOf<AActor> ClassToLookFor) const
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToLookFor, FoundActors);
+	return FoundActors;
 }
 
 UFAGameInstance* UQuest::GetFAGameInstance() const
