@@ -4,13 +4,13 @@
 #include "WorldMap/MapGraph.h"
 #include "WorldMap/MapNode.h"
 
-void UMapGraph::GenerateMap(int32 Depth)
+void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 {
 	this->MaxDepth = Depth;
 
 	RootNode = NewObject<UMapNode>(this);
 	RootNode->SetHeightLevel(0);
-	ExpandNode(RootNode);
+	ExpandNode(RootNode, QuestsToPlace);
 	//RootNode->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum);
 	CurrentNode = RootNode;
 }
@@ -25,12 +25,13 @@ int32 UMapGraph::GetGraphDepth() const
 	return RootNode->GetGraphDepth();
 }
 
-void UMapGraph::ExpandNode(UMapNode* Node)
+void UMapGraph::ExpandNode(UMapNode* Node, const TArray<UQuest*>& QuestsToPlace)
 {
 	if (Node->GetChildNodes().Num() > 0)
 		return;
 
-	Node->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum, Node->GetDepth() + 1);
+	// TODO: Must generate map based on current QuestIterator
+	Node->GenerateChildrenNodes(QuestsToPlace, Node->GetDepth() + 1);
 	//FixIntersections(Node);
 	int32 X = 0;
 	RootNode->MakeGridLayout(X);

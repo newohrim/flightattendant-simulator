@@ -3,12 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestNode.h"
+#include "WorldMap/LocationInfo.h"
+#include "Quests/QuestNode.h"
 #include "UObject/Object.h"
 #include "Quest.generated.h"
 
 class UQuestNode;
 class UFAGameInstance;
+class ULocationInfo;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FQuestFinished, UQuest*)
 
 UENUM()
 enum EQuestStatus
@@ -22,12 +26,14 @@ enum EQuestStatus
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType, Abstract, EditInlineNew)
+UCLASS(Blueprintable, BlueprintType, Abstract)
 class FLIGHTATTENDANTSIM_API UQuest : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	FQuestFinished QuestFinished;
+	
 	UQuest();
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EQuestStatus> QuestStatus = EQuestStatus::Waiting;
@@ -38,6 +44,18 @@ public:
 	void SetCurrentNode(UQuestNode* Node) { CurrentNode = Node; }
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetCurrentGoals() const;
+	UFUNCTION(BlueprintCallable)
+	const TArray<ULocationInfo*>& GetLocationsToGenerate() const { return LocationsToGenerate; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FString GetQuestName() const { return QuestName; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsPlaced () const { return IsPlaced; }
+	UFUNCTION(BlueprintCallable)
+	void SetIsPlaced(bool Value) { IsPlaced = true; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsFamiliar() const { return IsFamiliar; }
+	UFUNCTION(BlueprintCallable)
+	void SetIsFamiliar(bool Value) { IsFamiliar = Value; }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Init();
@@ -52,6 +70,7 @@ public:
 	}
 	
 protected:
+	// Super helpful wrapper for GetAllActorsOfClass to call it from blueprint
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<AActor*> GetTargetActors(const TSubclassOf<AActor> ClassToLookFor) const;
 	
@@ -62,8 +81,17 @@ protected:
 	FString ClientName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (MultiLine="true"), Category = "QuestInfo")
 	FString QuestDescription;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "QuestInfo")
+	TArray<ULocationInfo*> LocationsToGenerate;
 	UPROPERTY()
 	UQuestNode* CurrentNode;
+	// Is quest placed e.g. used for World Map generation?
+	UPROPERTY(BlueprintReadOnly)
+	bool IsPlaced = false;
+	// Is quest familiar to Player?
+	// It could be if player talked to one of the quest characters.
+	UPROPERTY(BlueprintReadOnly)
+	bool IsFamiliar = false;
 	
 	UFAGameInstance* GetFAGameInstance() const;
 };

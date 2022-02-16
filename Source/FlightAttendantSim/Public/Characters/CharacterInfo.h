@@ -3,20 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
 #include "CharacterInfo.generated.h"
 
-USTRUCT()
-struct FLIGHTATTENDANTSIM_API FCharacterInfo
+class AFABaseCharacter;
+
+UCLASS(BlueprintType, EditInlineNew)
+class FLIGHTATTENDANTSIM_API UCharacterInfo : public UObject
 {
 	GENERATED_BODY()
 	
+public:
 	UPROPERTY()
-	TAssetSubclassOf<AActor> CharacterToSpawn;
+	TAssetSubclassOf<AFABaseCharacter> CharacterToSpawn;
 	UPROPERTY(EditDefaultsOnly)
 	FName CharacterName;
 	UPROPERTY(EditDefaultsOnly)
 	FText CharacterDisplayName;
-	// Dialogs info
-	// ............
+	// Dialogs info (or i already set them in CharacterToSpawn?)
+	// ............ 
 };

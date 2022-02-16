@@ -2,6 +2,8 @@
 
 
 #include "WorldMap/MapNode.h"
+#include "WorldMap/LocationInfo.h"
+#include "Quests/Quest.h"
 
 int32 UMapNode::GetGraphDepth() const
 {
@@ -63,29 +65,54 @@ void UMapNode::GetConnectedPairs(TArray<FVector2D>& NodePairs) const
 	}
 }
 
-void UMapNode::GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum, const int32 NewDepth)
+void UMapNode::GenerateChildrenNodes(const TArray<UQuest*>& QuestsToPlace, const int32 NewDepth)
 {
-	for (int i = 0; i < Num; ++i)
+	int32 ChildrenCount = 0;
+	for (UQuest* Quest : QuestsToPlace)
 	{
-		ChildNodes.Add(GenerateNode(
-			FMath::RandRange(1, MaxFacilitiesNum)));
-		ChildNodes.Last()->SetDepth(NewDepth);
-		ChildNodes.Last()->SetParentNode(this);
+		auto& Locations = Quest->GetLocationsToGenerate();
+        if (Locations.Num() == 0)
+        {
+        	UE_LOG(LogTemp, Error,
+        		TEXT("%s quest has zero locations linked to it self."), 
+        		*(Quest->GetQuestName()));
+        	return;
+        }
+		
+        UMapNode* CurrentChild = this;
+		for (int j = 0; j < Locations.Num(); ++j)
+		{
+			// Forming a straight line of quest narration
+			// (not as flexible as I'd like, but ok)
+			// TODO: Make special array of spaces between locations. This way it will be more flexible.
+			CurrentChild->ChildNodes.Add(GenerateNode(Locations[j]));
+			CurrentChild = ChildNodes.Last();
+			CurrentChild->SetDepth(NewDepth);
+			CurrentChild->SetParentNode(this);
+		}
+		Quest->SetIsPlaced(true);
+		++ChildrenCount;
+		if (ChildrenCount >= MaxChildrenCount)
+			break;
 	}
 }
 
-UMapNode* UMapNode::GenerateNode(const int32 FacilitiesNum)
+UMapNode* UMapNode::GenerateNode(ULocationInfo* LocInfo)
 {
 	UMapNode* Node = NewObject<UMapNode>(this);
 	if (!Node)
 		return nullptr;
 
-	for (int i = 0; i < FacilitiesNum; ++i)
+	// Share of references (shit code?)
+	Node->LocationInfo = LocInfo;
+	LocInfo->CorrespondingNode = Node;
+	/*
+	for (int i = 0; i < LocationInfo.Facilities.Num(); ++i)
 	{
 		EFacilityType NewFacility = static_cast<EFacilityType>(
 			FMath::RandHelper(EFacilityType::FACILITY_NR_ITEMS));
-		Node->Facilities.Add(NewFacility);
-	}
+		Node->LocationInfo.Facilities.Add(NewFacility);
+	}*/
 
 	return Node;
 }

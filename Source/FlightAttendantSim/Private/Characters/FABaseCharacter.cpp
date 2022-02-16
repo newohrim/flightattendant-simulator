@@ -40,10 +40,10 @@ void AFABaseCharacter::SitOnSeat(ASeat* Seat)
 	IsSitting = true;
 	CurrentSeat = Seat;
 	const FVector StaticPos = Seat->GetMoveToLocation().GetLocation();
+	// Prevent player from falling through the ground
+	GetCharacterMovement()->GravityScale = 0.0f;
 	SetActorLocationAndRotation(FVector(StaticPos.X, StaticPos.Y, GetActorLocation().Z),
 		Seat->GetMoveToLocation().Rotator());
-	// Character falling under the plane after the call below
-	// SetActorTransform(Seat->GetMoveToLocation());
 }
 
 void AFABaseCharacter::StandFromSeat()
@@ -63,12 +63,12 @@ void AFABaseCharacter::BeginPlay()
 
 FName AFABaseCharacter::GetParticipantName_Implementation() const
 {
-	return CharacterInfo.CharacterName;
+	return CharacterInfo->CharacterName;
 }
 
 FText AFABaseCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
 {
-	return CharacterInfo.CharacterDisplayName;
+	return CharacterInfo->CharacterDisplayName;
 }
 
 void AFABaseCharacter::TalkTo(UObject* PlayerInstance)

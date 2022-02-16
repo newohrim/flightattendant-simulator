@@ -2,3 +2,4 @@
 
 
 #include "WorldMap/LocationInfo.h"
+#include "Characters/CharacterInfo.h"

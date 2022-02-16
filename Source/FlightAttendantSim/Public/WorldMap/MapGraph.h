@@ -8,6 +8,9 @@
 #include "MapGraph.generated.h"
 
 class UMapNode;
+class UQuest;
+
+typedef TIndexedContainerIterator<TArray<UQuest*>, UQuest*, TArray<UQuest*>::SizeType> TQuestIterator;
 
 /**
  * 
@@ -18,7 +21,7 @@ class FLIGHTATTENDANTSIM_API UMapGraph : public UObject
 	GENERATED_BODY()
 	
 public:
-	void GenerateMap(int32 Depth);
+	void GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace);
 	int32 GetCurrentDepth() const;
 	int32 GetGraphDepth() const;
 
@@ -33,8 +36,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const TArray<FVector2D>& GetNodesPairs() const { return NodesPairs; }
 
-	UFUNCTION(BlueprintCallable)
-	void ExpandNode(UMapNode* Node);
+	//UFUNCTION(BlueprintCallable)
+	void ExpandNode(UMapNode* Node, const TArray<UQuest*>& QuestsToPlace);
 
 protected:
 	int32 MaxDepth = 10;

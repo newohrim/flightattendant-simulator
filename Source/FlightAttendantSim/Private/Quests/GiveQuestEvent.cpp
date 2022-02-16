@@ -2,6 +2,8 @@
 
 
 #include "Quests/GiveQuestEvent.h"
+
+#include "FAGameMode.h"
 #include "Quests/Quest.h"
 
 void UGiveQuestEvent::EnterEvent_Implementation(UDlgContext* Context, UObject* Participant)
@@ -13,7 +15,10 @@ void UGiveQuestEvent::EnterEvent_Implementation(UDlgContext* Context, UObject* P
 		UE_LOG(LogTemp, Display, TEXT("QuestToGive in dialogue event wans't set properly."));
 		return;
 	}
-	// QuestToGive->Init();
-	// TODO: Quest properties are need to be set and Init() to be called before TakeQuest.
-	QuestToGive->TakeQuest();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		AFAGameMode* GameMode = Cast<AFAGameMode>(World->GetAuthGameMode());
+		GameMode->TakeQuest(QuestToGive);
+	}
 }

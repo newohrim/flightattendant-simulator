@@ -27,13 +27,16 @@ void UQuest::TakeQuest()
 	if (!CurrentNode || QuestStatus != EQuestStatus::Waiting)
 		return;
 
+	/* Happens in game mode now
 	UWorld* World = GetWorld();
 	if (!World)
 		return;
 	Cast<AFAGameMode>(World->GetAuthGameMode())->AddTakenQuest(this);
+	*/
 
 	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	QuestStatus = EQuestStatus::Taken;
+	IsFamiliar = true;
 }
 
 void UQuest::ChangeNode(UQuestNode* NextNode)
@@ -52,11 +55,14 @@ void UQuest::FinishQuest()
 {
 	QuestStatus = EQuestStatus::Completed;
 	CurrentNode->NodeCompleted.Unbind();
+	/* Happens in game mode now
 	UWorld* World = GetWorld();
 	if (!World)
 		return;
 	Cast<AFAGameMode>(World->GetAuthGameMode())->RemoveFinishedQuest(this);
+	*/
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Quest completed."));
+	QuestFinished.Broadcast(this);
 }
 
 TArray<AActor*> UQuest::GetTargetActors(const TSubclassOf<AActor> ClassToLookFor) const

@@ -6,6 +6,9 @@
 #include "UObject/Object.h"
 #include "MapNode.generated.h"
 
+class ULocationInfo;
+class UQuest;
+
 UENUM(BlueprintType)
 enum EFacilityType
 {
@@ -42,27 +45,29 @@ public:
 	UMapNode* GetParentNode() const { return ParentNode; }
 	UFUNCTION(BlueprintCallable)
 	void SetParentNode(UMapNode* NewParentNode) { ParentNode = NewParentNode; }
+	ULocationInfo* GetLocationInfo() const { return LocationInfo; }
 
 	void UpdateHeightLevels(int32 HeightIncrement);
 	void MakeGridLayout(int32& X);
 	void GetConnectedPairs(TArray<FVector2D>& NodePairs) const;
 	
-	UFUNCTION(BlueprintCallable)
-	void GenerateChildrenNodes(const int32 Num, const int32 MaxFacilitiesNum, const int32 NewDepth);
+	void GenerateChildrenNodes(const TArray<UQuest*>& QuestsToPlace, const int32 NewDepth);
 	UFUNCTION(BlueprintCallable)
 	const TArray<UMapNode*>& GetChildNodes() const { return ChildNodes; }
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	TArray<UMapNode*> ChildNodes;
+	ULocationInfo* LocationInfo;
 	UPROPERTY(BlueprintReadOnly)
-	TArray<TEnumAsByte<EFacilityType>> Facilities;
+	TArray<UMapNode*> ChildNodes;
 	UPROPERTY(BlueprintReadOnly)
 	UMapNode* ParentNode = nullptr;
 
-	UMapNode* GenerateNode(int32 FacilitiesNum);
+	UMapNode* GenerateNode(ULocationInfo* LocInfo);
 
 private:
+	static constexpr int32 MaxChildrenCount = 3;
+	
 	int32 HeightLevel = 0;
 	int32 Depth = 0;
 };

@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/CharacterInfo.h"
 #include "../../../../Plugins/DlgSystem-v15/Source/DlgSystem/Public/DlgDialogueParticipant.h"
 #include "GameFramework/Character.h"
-#include "Characters/CharacterInfo.h"
 #include "FABaseCharacter.generated.h"
 
+class UCharacterInfo;
 class ASeat;
 class UDialogueComponent;
 
@@ -36,8 +37,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly)
-	FCharacterInfo CharacterInfo;
+	UPROPERTY(EditDefaultsOnly, Instanced)
+	UCharacterInfo* CharacterInfo;
 
 	virtual FName GetParticipantName_Implementation() const override;
 	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;

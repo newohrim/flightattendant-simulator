@@ -21,6 +21,6 @@ public:
 	virtual void EnterEvent_Implementation(UDlgContext* Context, UObject* Participant) override;
 
 protected:
-	UPROPERTY(EditAnywhere, Instanced)
-	UQuest* QuestToGive;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UQuest> QuestToGive;
 };

@@ -2,3 +2,4 @@
 
 
 #include "Characters/CharacterInfo.h"
+#include "Characters/FABaseCharacter.h"
