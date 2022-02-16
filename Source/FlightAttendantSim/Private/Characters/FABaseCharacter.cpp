@@ -63,12 +63,12 @@ void AFABaseCharacter::BeginPlay()
 
 FName AFABaseCharacter::GetParticipantName_Implementation() const
 {
-	return CharacterInfo->CharacterName;
+	return CharacterInfo.CharacterName;
 }
 
 FText AFABaseCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
 {
-	return CharacterInfo->CharacterDisplayName;
+	return CharacterInfo.CharacterDisplayName;
 }
 
 void AFABaseCharacter::TalkTo(UObject* PlayerInstance)

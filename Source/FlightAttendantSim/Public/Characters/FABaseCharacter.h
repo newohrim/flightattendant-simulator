@@ -8,7 +8,6 @@
 #include "GameFramework/Character.h"
 #include "FABaseCharacter.generated.h"
 
-class UCharacterInfo;
 class ASeat;
 class UDialogueComponent;
 
@@ -37,8 +36,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Instanced)
-	UCharacterInfo* CharacterInfo;
+	UPROPERTY(EditDefaultsOnly)
+	FCharacterInfo CharacterInfo;
 
 	virtual FName GetParticipantName_Implementation() const override;
 	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;

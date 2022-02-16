@@ -7,8 +7,6 @@
 #include "WorldMap/MapNode.h"
 #include "LocationInfo.generated.h"
 
-class UCharacterInfo;
-
 /**
  * 
  */

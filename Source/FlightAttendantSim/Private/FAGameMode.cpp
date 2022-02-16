@@ -79,7 +79,7 @@ void AFAGameMode::TakeQuest(TSubclassOf<UQuest> TakenQuest)
 {
 	for (UQuest* Quest : PlacedQuests)
 	{
-		if (Quest->StaticClass() == TakenQuest.Get())
+		if (Quest->IsA(TakenQuest.Get()))
 		{
 			Quest->TakeQuest();
 			AddTakenQuest(Quest);

@@ -7,8 +7,8 @@
 
 class AFABaseCharacter;
 
-UCLASS(BlueprintType, EditInlineNew)
-class FLIGHTATTENDANTSIM_API UCharacterInfo : public UObject
+USTRUCT(BlueprintType)
+struct FCharacterInfo
 {
 	GENERATED_BODY()
 	
