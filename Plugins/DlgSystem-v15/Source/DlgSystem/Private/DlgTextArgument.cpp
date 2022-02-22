@@ -47,6 +47,9 @@ FFormatArgumentValue FDlgTextArgument::ConstructFormatArgumentValue(const UDlgCo
 		case EDlgTextArgumentType::Gender:
 			return FFormatArgumentValue(IDlgDialogueParticipant::Execute_GetParticipantGender(Participant));
 
+		case EDlgTextArgumentType::CustomText:
+			return FFormatArgumentValue(IDlgDialogueParticipant::Execute_GetParticipantCustomText(Participant, VariableName));
+
 		case EDlgTextArgumentType::Custom:
 			if (CustomTextArgument == nullptr)
 			{

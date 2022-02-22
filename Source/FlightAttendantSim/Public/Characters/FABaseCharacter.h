@@ -6,10 +6,12 @@
 #include "Characters/CharacterInfo.h"
 #include "../../../../Plugins/DlgSystem-v15/Source/DlgSystem/Public/DlgDialogueParticipant.h"
 #include "GameFramework/Character.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "FABaseCharacter.generated.h"
 
 class ASeat;
 class UDialogueComponent;
+class UActionExecutorComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTargetReached);
 
@@ -23,11 +25,15 @@ public:
 	AFABaseCharacter();
 
 	UFUNCTION(BlueprintCallable)
-	void MoveTo(const FVector TargetLocation);
+	EPathFollowingRequestResult::Type MoveTo(const FVector TargetLocation);
 	UFUNCTION(BlueprintCallable)
 	void SitOnSeat(ASeat* Seat);
 	UFUNCTION(BlueprintCallable)
 	void StandFromSeat();
+	UFUNCTION(BlueprintCallable)
+	ASeat* GetCurrentSeat() const { return CurrentSeat; }
+	UFUNCTION(BlueprintCallable)
+	UActionExecutorComponent* GetActionExecutorComponent() const { return ActionExecutorComponent; }
 
 	UPROPERTY(BlueprintAssignable)
 	FTargetReached TargetReached;
@@ -41,13 +47,14 @@ protected:
 
 	virtual FName GetParticipantName_Implementation() const override;
 	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;
+	virtual FText GetParticipantCustomText_Implementation(FName ValueName) const override;
 	UFUNCTION(BlueprintCallable)
 	virtual void TalkTo(UObject* PlayerInstance);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	USkeletalMeshComponent* SkeletalMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UDialogueComponent* DialogueComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UActionExecutorComponent* ActionExecutorComponent;
 	
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* SitToStandAnim;
@@ -55,7 +62,6 @@ protected:
 	bool IsSitting = false;
 	UPROPERTY(BlueprintReadOnly)
 	ASeat* CurrentSeat;
-	
 
 private:
 	bool IsMoving = false;

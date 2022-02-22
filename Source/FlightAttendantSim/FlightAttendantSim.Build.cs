@@ -26,6 +26,7 @@ public class FlightAttendantSim : ModuleRules
 			"FlightAttendantSim/Public/Quests",
 			"FlightAttendantSim/Public/WorldMap",
 			"FlightAttendantSim/Public/Characters",
+			"FlightAttendantSim/Public/Characters/Actions",
 			"FlightAttendantSim/Public/SpacePlane"
 		});
 

@@ -34,6 +34,9 @@ class DLGSYSTEM_API IDlgDialogueParticipant
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Dialogue|Participant")
 	FText GetParticipantDisplayName(FName ActiveSpeaker) const;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Dialogue|Participant")
+	FText GetParticipantCustomText(FName ValueName) const;
+
 	/** May be used for formatted node texts, check https://docs.unrealengine.com/en-us/Gameplay/Localization/Formatting for more information */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Dialogue|Participant")
 	ETextGender GetParticipantGender() const;

@@ -36,6 +36,8 @@ enum class EDlgTextArgumentType : uint8
 	// Gets the value from the Participant Text Variable
 	ClassText		UMETA(DisplayName = "Class Text Variable"),
 
+	// Calls GetCustomText on the Participant
+	CustomText		UMETA(DisplayName = "Custom Text"),
 
 	// User Defined Text Argument, calls GetText on the custom text argument object.
 	//

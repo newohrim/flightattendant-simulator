@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SpacePlane/Seat.h"
 #include "Characters/DialogueComponent.h"
+#include "Characters/ActionExecutorComponent.h"
 
 
 // Sets default values
@@ -14,25 +15,31 @@ AFABaseCharacter::AFABaseCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMesh");
-	SkeletalMesh->SetupAttachment(GetRootComponent());
 	DialogueComponent = CreateDefaultSubobject<UDialogueComponent>("DialogueComponent");
+	ActionExecutorComponent = CreateDefaultSubobject<UActionExecutorComponent>("ActionExecutorComponent");
 }
 
-void AFABaseCharacter::MoveTo(const FVector TargetLocation)
+EPathFollowingRequestResult::Type AFABaseCharacter::MoveTo(const FVector TargetLocation)
 {
+	//Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed =
+	//	FMath::FInterpConstantTo(Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed,
+	//		InitialWalkSpeed, DeltaTime, 100.0f);
+
 	IsMoving = true;
-	CurrentMovingTarget = TargetLocation;
-	Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed = 0.0f;
-	
-	/*
 	AAIController* CharacterController = Cast<AAIController>(Controller);
 	if (CharacterController)
 	{
 		// TODO: Remember moving result and analyse to fix any moving issues.
-		CharacterController->MoveToLocation(TargetLocation);
+		const auto Result = CharacterController->MoveToLocation(TargetLocation);
+		if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			IsMoving = false;
+			TargetReached.Broadcast();
+		}
+		return Result;
 	}
-	*/
+
+	return EPathFollowingRequestResult::Failed;
 }
 
 void AFABaseCharacter::SitOnSeat(ASeat* Seat)
@@ -71,6 +78,11 @@ FText AFABaseCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpe
 	return CharacterInfo.CharacterDisplayName;
 }
 
+FText AFABaseCharacter::GetParticipantCustomText_Implementation(FName ValueName) const
+{
+	return FText::FromString("");
+}
+
 void AFABaseCharacter::TalkTo(UObject* PlayerInstance)
 {
 	DialogueComponent->StartDialogue({PlayerInstance, this});
@@ -80,25 +92,7 @@ void AFABaseCharacter::TalkTo(UObject* PlayerInstance)
 void AFABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (IsMoving)
-	{
-		Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed =
-			FMath::FInterpConstantTo(Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed,
-				InitialWalkSpeed, DeltaTime, 100.0f);
-		
-		AAIController* CharacterController = Cast<AAIController>(Controller);
-		if (CharacterController)
-		{
-			// TODO: Remember moving result and analyse to fix any moving issues.
-			const auto Result = CharacterController->MoveToLocation(CurrentMovingTarget);
-			if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
-			{
-				IsMoving = false;
-				TargetReached.Broadcast();
-			}
-		}
-	}
+	
 }
 
 // Called to bind functionality to input

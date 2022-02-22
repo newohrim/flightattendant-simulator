@@ -2,15 +2,24 @@
 
 
 #include "FAGameMode.h"
+
+#include "Characters/Actions/CharacterSitAction.h"
+#include "Characters/Actions/CharacterMoveAction.h"
+#include "Characters/ActionExecutorComponent.h"
+#include "SpacePlane/PassengerSeat.h"
 #include "Engine/AssetManager.h"
 #include "Quests/Quest.h"
 #include "Characters/FABaseCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "SpacePlane/SpacePlane.h"
+#include "Characters/FABasePassenger.h"
 
 void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
 	DebugCharactersSpawnLocations.Empty();
+	SpacePlane = NewObject<USpacePlane>(this);
 
 	{ // TODO: Decompose to protected func
 		const UAssetManager& AssetManager = UAssetManager::Get();
@@ -50,6 +59,12 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 void AFAGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// SpacePlane is being created in InitGame
+	check(SpacePlane);
+	TArray<AActor*> PassengerSeats;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APassengerSeat::StaticClass(), PassengerSeats);
+	SpacePlane->SetUp(PassengerSeats);
 }
 
 void AFAGameMode::LocationLoadedHandle()
@@ -83,7 +98,7 @@ void AFAGameMode::TakeQuest(TSubclassOf<UQuest> TakenQuest)
 		{
 			Quest->TakeQuest();
 			AddTakenQuest(Quest);
-			break;
+			return;
 		}
 	}
 
@@ -119,6 +134,12 @@ void AFAGameMode::ExpandMapNode(UMapNode* NodeToExpand)
 
 void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 {
+	if (!NodeTravelTo)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NodeTravelTo was null."));
+		return;
+	}
+	
 	// EMPTY LOCATION
 	{
 		for (AFABaseCharacter* SpawnedCharacter : SpawnedCharacters)
@@ -151,6 +172,29 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 	
 	// EXPAND NODE
 	ExpandMapNode(NodeTravelTo);
+}
+
+void AFAGameMode::LetPassengerInPlane(AFABasePassenger* PassengerToLetIn)
+{
+	if (SpacePlane->AssignPassenger(PassengerToLetIn))
+	{
+		const FVector MoveToSeatLocation =
+			PassengerToLetIn->GetAssignedPassengerSeat()->GetMoveToLocation().GetLocation();
+		//PassengerToLetIn->TargetReached.AddDynamic(PassengerToLetIn, &AFABasePassenger::SitOnSeat);
+		//PassengerToLetIn->MoveTo(MoveToSeatLocation);
+		UActionExecutorComponent* ActionExecutor = PassengerToLetIn->GetActionExecutorComponent();
+		ActionExecutor->SetActions(
+		{
+			new FCharacterMoveAction(MoveToSeatLocation),
+			new FCharacterSitAction(PassengerToLetIn->GetAssignedPassengerSeat())
+		});
+		ActionExecutor->ExecuteActions();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("LetPassengerInPlane was called, but there was no place on free seats."));
+	}
 }
 
 TArray<UQuest*> AFAGameMode::SampleQuestList(const int32 Num)

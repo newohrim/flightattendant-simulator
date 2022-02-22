@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Seat.generated.h"
 
+class AFABaseCharacter;
+
 UCLASS()
 class FLIGHTATTENDANTSIM_API ASeat : public AActor
 {
@@ -20,6 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FTransform& GetSnapLocation() const { return SnapLocation->GetComponentTransform(); }
 
+	bool IsCharacterAssigned() const { return AssignedCharacter != nullptr; }
+	void AssignCharacter(AFABaseCharacter* CharacterToAssign) { AssignedCharacter = CharacterToAssign; }
+	void DeassignCharacter() { AssignedCharacter = nullptr; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,4 +36,7 @@ protected:
 	USceneComponent* MoveToLocation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USceneComponent* SnapLocation;
+
+	UPROPERTY(BlueprintReadOnly)
+	AFABaseCharacter* AssignedCharacter = nullptr;
 };

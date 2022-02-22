@@ -4,22 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "DlgEventCustom.h"
-#include "GiveQuestEvent.generated.h"
-
-class UQuest;
+#include "LetInPassengerEvent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FLIGHTATTENDANTSIM_API UGiveQuestEvent : public UDlgEventCustom
+class FLIGHTATTENDANTSIM_API ULetInPassengerEvent : public UDlgEventCustom
 {
 	GENERATED_BODY()
 
 public:
 	virtual void EnterEvent_Implementation(UDlgContext* Context, UObject* Participant) override;
-
-protected:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UQuest> QuestToGive;
 };

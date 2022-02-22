@@ -9,8 +9,10 @@
 #include "FAGameMode.generated.h"
 
 class AFABaseCharacter;
+class AFABasePassenger;
 class UMapNode;
 class UQuest;
+class USpacePlane;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 
@@ -37,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TravelPlayerToNode(UMapNode* NodeTravelTo);
+
+	UFUNCTION(BlueprintCallable)
+	void LetPassengerInPlane(AFABasePassenger* PassengerToLetIn);
 	
 protected:
 	// The depth of final node
@@ -49,6 +54,8 @@ protected:
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
 	UMapGraph* WorldMap;
+	UPROPERTY(BlueprintReadOnly)
+	USpacePlane* SpacePlane;
 	// Quests taken by player.
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UQuest*> TakenQuests;
