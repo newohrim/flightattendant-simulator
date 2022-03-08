@@ -15,9 +15,9 @@ struct FCharacterInfo
 public:
 	UPROPERTY()
 	TAssetSubclassOf<AFABaseCharacter> CharacterToSpawn;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName CharacterName;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText CharacterDisplayName;
 	// Dialogs info (or i already set them in CharacterToSpawn?)
 	// ............ 

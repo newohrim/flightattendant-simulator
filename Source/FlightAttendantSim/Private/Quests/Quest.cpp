@@ -4,6 +4,7 @@
 #include "Quests/Quest.h"
 #include "FAGameInstance.h"
 #include "FAGameMode.h"
+#include "QuestTransition.h"
 #include "Kismet/GameplayStatics.h"
 #include "Quests/QuestNode.h"
 
@@ -39,16 +40,26 @@ void UQuest::TakeQuest()
 	IsFamiliar = true;
 }
 
-void UQuest::ChangeNode(UQuestNode* NextNode)
+void UQuest::ChangeNode(UQuestTransition* ExecutedTransition)
 {
 	if (QuestStatus != EQuestStatus::Taken)
 		return;
-	if (NextNode->IsLast())
-		FinishQuest();
 	
-	CurrentNode->NodeCompleted.Unbind();
-	CurrentNode = NextNode;
-	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
+	if (CurrentNode->ContainsTransition(ExecutedTransition))
+	{
+		ExecutedTransition->ExecutePostEvents();
+		CurrentNode->NodeCompleted.Unbind();
+		CurrentNode = ExecutedTransition->GetTargetNode();
+		if (CurrentNode->IsLast())
+		{
+			FinishQuest();
+		}
+		else
+		{
+			CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
+			CurrentNode->ExecutePreEvents();
+		}
+	}
 }
 
 void UQuest::FinishQuest()

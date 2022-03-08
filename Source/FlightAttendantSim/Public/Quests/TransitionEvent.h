@@ -9,11 +9,11 @@
 /**
  * 
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, EditInlineNew, Abstract)
 class FLIGHTATTENDANTSIM_API UTransitionEvent : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	virtual void Execute() {};
+	virtual void Execute() {}
 };

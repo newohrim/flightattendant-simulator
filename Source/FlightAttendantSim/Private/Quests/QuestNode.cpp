@@ -12,9 +12,9 @@ void UQuestNode::Init()
 	}
 }
 
-void UQuestNode::CompleteNode(UQuestNode* NextNode)
+void UQuestNode::CompleteNode(UQuestTransition* ExecutedTransition)
 {
-	NodeCompleted.ExecuteIfBound(NextNode);
+	NodeCompleted.ExecuteIfBound(ExecutedTransition);
 }
 
 UQuestTransition* UQuestNode::AddTransition(const FString& QuestDescription, UQuestTransition* Transition)
@@ -38,4 +38,12 @@ TArray<FString> UQuestNode::GetNodeGoals() const
 	}
 	
 	return Goals;
+}
+
+void UQuestNode::ExecutePreEvents() const
+{
+	for (const UQuestTransition* Transition : ChildTransitions)
+	{
+		Transition->ExecutePreEvents();
+	}
 }

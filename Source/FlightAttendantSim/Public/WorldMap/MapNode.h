@@ -46,6 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetParentNode(UMapNode* NewParentNode) { ParentNode = NewParentNode; }
 	ULocationInfo* GetLocationInfo() const { return LocationInfo; }
+	void SetLocationInfo(ULocationInfo* LocInfo) { LocationInfo = LocInfo; }
 
 	void UpdateHeightLevels(int32 HeightIncrement);
 	void MakeGridLayout(int32& X);

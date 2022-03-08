@@ -33,6 +33,7 @@ public:
 	UMapNode* GetRootNode() const { return RootNode; }
 	UFUNCTION(BlueprintCallable)
 	UMapNode* GetCurrentNode() const { return CurrentNode; }
+	void SetCurrentNode(UMapNode* MapNode) { CurrentNode = MapNode; }
 	UFUNCTION(BlueprintCallable)
 	const TArray<FVector2D>& GetNodesPairs() const { return NodesPairs; }
 

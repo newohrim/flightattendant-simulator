@@ -2,6 +2,8 @@
 
 
 #include "WorldMap/MapGraph.h"
+
+#include "LocationInfo.h"
 #include "WorldMap/MapNode.h"
 
 void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
@@ -10,6 +12,10 @@ void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 
 	RootNode = NewObject<UMapNode>(this);
 	RootNode->SetHeightLevel(0);
+	ULocationInfo* RootLocation = NewObject<ULocationInfo>(this);
+	RootLocation->CorrespondingNode = RootNode;
+	RootLocation->LocationName = FText::FromString("RootStation");
+	RootNode->SetLocationInfo(RootLocation);
 	ExpandNode(RootNode, QuestsToPlace);
 	//RootNode->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum);
 	CurrentNode = RootNode;

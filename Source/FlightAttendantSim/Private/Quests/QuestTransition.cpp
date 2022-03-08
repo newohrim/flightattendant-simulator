@@ -7,5 +7,21 @@
 
 void UQuestTransition::ExecuteTransition()
 {
-	TransitionComplete.ExecuteIfBound(TargetNode);
+	TransitionComplete.ExecuteIfBound(this);
+}
+
+void UQuestTransition::ExecutePreEvents() const
+{
+	for (UTransitionEvent* Event : PreEvents)
+	{
+		Event->Execute();
+	}
+}
+
+void UQuestTransition::ExecutePostEvents() const
+{
+	for (UTransitionEvent* Event : PostEvents)
+	{
+		Event->Execute();
+	}
 }

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MapNode.h"
-#include "GameFramework/GameModeBase.h"
+#include "WorldMap/MapNode.h"
 #include "WorldMap/MapGraph.h"
+#include "GameFramework/GameModeBase.h"
 #include "FAGameMode.generated.h"
 
 class AFABaseCharacter;
@@ -13,6 +13,9 @@ class AFABasePassenger;
 class UMapNode;
 class UQuest;
 class USpacePlane;
+class UPassengersManagerComponent;
+class UCargoManagerComponent;
+class UPDAMessengerComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 
@@ -25,6 +28,8 @@ class FLIGHTATTENDANTSIM_API AFAGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	AFAGameMode();
+	
 	UPROPERTY(BlueprintAssignable)
 	FTakenQuestsChanged TakenQuestsChanged;
 
@@ -42,20 +47,49 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LetPassengerInPlane(AFABasePassenger* PassengerToLetIn);
+
+	UFUNCTION(BlueprintCallable)
+	UCargoManagerComponent* GetCargoManager() const { return CargoDeliveryManager; }
+
+	UFUNCTION(BlueprintCallable)
+	UPDAMessengerComponent* GetPDAMessenger() const { return PDAMessenger; }
+
+	USpacePlane* GetSpacePlane() const { return SpacePlane; }
+
+	void ShowCargoPickMenu() const;
 	
 protected:
 	// The depth of final node
 	constexpr static int32 WorldMapMaxDepth = 10;
 	UPROPERTY(EditDefaultsOnly, Category = "MapGeneration")
 	int32 MaxNodeChildren = 3;
+	UPROPERTY(EditDefaultsOnly, Category = "MapGeneration")
+	int32 MinPassengers = 3;
+	UPROPERTY(EditDefaultsOnly, Category = "MapGeneration")
+	int32 MaxPassengers = 6;
 	UPROPERTY(BlueprintReadWrite, Category = "MapGeneration")
 	TArray<AActor*> DebugCharactersSpawnLocations;
+	UPROPERTY(BlueprintReadWrite, Category = "MapGeneration")
+	TArray<AActor*> DebugPassengersSpawnLocations;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> CargoPickMenuWidgetClass;
+	UPROPERTY(BlueprintReadOnly)
+	UUserWidget* CargoPickMenuWidget = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	UPassengersManagerComponent* PassengersManager;
+	UPROPERTY(EditDefaultsOnly)
+	UCargoManagerComponent* CargoDeliveryManager;
+	UPROPERTY(EditDefaultsOnly)
+	UPDAMessengerComponent* PDAMessenger;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
-	UMapGraph* WorldMap;
+	UMapGraph* WorldMap = nullptr;
+	// Player's spaceship abstraction
 	UPROPERTY(BlueprintReadOnly)
-	USpacePlane* SpacePlane;
+	USpacePlane* SpacePlane = nullptr;
 	// Quests taken by player.
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UQuest*> TakenQuests;
@@ -72,6 +106,7 @@ protected:
 	TArray<UQuest*> SampleQuestList(const int32 Num);
 	void UpdatePlacedQuests(const UMapNode* ExpandedNode, TArray<UQuest*>& QuestsToPlace);
 	void RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreFrom);
+	void FillPassengers();
 
 private:
 	UPROPERTY()

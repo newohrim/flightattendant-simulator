@@ -15,6 +15,7 @@ public class FlightAttendantSim : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"AIModule",
+			"UMG",
 			"DlgSystem"
 		});
 
@@ -27,7 +28,9 @@ public class FlightAttendantSim : ModuleRules
 			"FlightAttendantSim/Public/WorldMap",
 			"FlightAttendantSim/Public/Characters",
 			"FlightAttendantSim/Public/Characters/Actions",
-			"FlightAttendantSim/Public/SpacePlane"
+			"FlightAttendantSim/Public/Characters/Passengers",
+			"FlightAttendantSim/Public/SpacePlane",
+			"FlightAttendantSim/Public/CargoDelivery"
 		});
 
 		// Uncomment if you are using Slate UI

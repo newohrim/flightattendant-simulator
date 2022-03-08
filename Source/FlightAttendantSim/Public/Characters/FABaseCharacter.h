@@ -42,7 +42,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FCharacterInfo CharacterInfo;
 
 	virtual FName GetParticipantName_Implementation() const override;

@@ -9,7 +9,8 @@
 class UTransitionEvent;
 class UQuestNode;
 
-DECLARE_DELEGATE_OneParam(FTransitionCompleted, UQuestNode*)
+class UQuestTransition;
+DECLARE_DELEGATE_OneParam(FTransitionCompleted, UQuestTransition*)
 
 /**
  * 
@@ -33,11 +34,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTargetNode(UQuestNode* Node) { TargetNode = Node; }
 
+	UFUNCTION(BlueprintCallable)
+	void AddPreEvent(UTransitionEvent* Event) { PreEvents.Add(Event); }
+	UFUNCTION(BlueprintCallable)
+	void AddPostEvent(UTransitionEvent* Event) { PostEvents.Add(Event); }
+	
+	void ExecutePreEvents() const;
+	void ExecutePostEvents() const;
+
 protected:
 	UPROPERTY()
 	UQuestNode* TargetNode;
-	TSubclassOf<UTransitionEvent> PreEvent;
-	TSubclassOf<UTransitionEvent> PostEvent;
+	UPROPERTY(Instanced, EditDefaultsOnly)
+	TArray<UTransitionEvent*> PreEvents;
+	UPROPERTY(Instanced, EditDefaultsOnly)
+	TArray<UTransitionEvent*> PostEvents;
 
 	FString TransitionDescription;
 };

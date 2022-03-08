@@ -61,7 +61,7 @@ public:
 	void Init();
 	UFUNCTION(BlueprintCallable)
 	void TakeQuest();
-	void ChangeNode(UQuestNode* NextNode);
+	void ChangeNode(UQuestTransition* ExecutedTransition);
 	void FinishQuest();
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override

@@ -7,9 +7,8 @@
 #include "QuestNode.generated.h"
 
 class UQuestTransition;
-class UQuestNode;
 
-DECLARE_DELEGATE_OneParam(FNodeCompleted, UQuestNode*)
+DECLARE_DELEGATE_OneParam(FNodeCompleted, UQuestTransition*)
 
 /**
  * 
@@ -24,11 +23,13 @@ public:
 
 	// Obsolete test function
 	void Init();
-	void CompleteNode(UQuestNode* NextNode);
+	void CompleteNode(UQuestTransition* ExecutedTransition);
 	UFUNCTION(BlueprintCallable)
 	UQuestTransition* AddTransition(const FString& QuestDescription, UQuestTransition* Transition = nullptr);
 	bool IsLast() const { return ChildTransitions.Num() == 0; }
 	TArray<FString> GetNodeGoals() const;
+	void ExecutePreEvents() const;
+	bool ContainsTransition(UQuestTransition* Transition) const { return ChildTransitions.Contains(Transition); }
 
 protected:
 	UPROPERTY()

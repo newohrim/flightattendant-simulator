@@ -4,6 +4,7 @@
 #include "SpacePlane/SpacePlane.h"
 #include "SpacePlane/PassengerSeat.h"
 #include "Characters/FABasePassenger.h"
+#include "SpacePlane/CargoCell.h"
 
 void USpacePlane::SetUp(const TArray<AActor*>& PassengerSeatsActors)
 {
@@ -12,6 +13,11 @@ void USpacePlane::SetUp(const TArray<AActor*>& PassengerSeatsActors)
 	{
 		PassengerSeats.Add(Cast<APassengerSeat>(PassengerSeatsActors[i]));
 	}
+}
+
+void USpacePlane::CreateCargoCell()
+{
+	CargoCell = NewObject<UCargoCell>(this);
 }
 
 bool USpacePlane::AssignPassenger(AFABasePassenger* PassengerToAssign)
