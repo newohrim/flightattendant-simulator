@@ -12,7 +12,7 @@ class AFABaseCharacter;
 class AFABasePassenger;
 class UMapNode;
 class UQuest;
-class USpacePlane;
+class USpacePlaneComponent;
 class UPassengersManagerComponent;
 class UCargoManagerComponent;
 class UPDAMessengerComponent;
@@ -49,12 +49,15 @@ public:
 	void LetPassengerInPlane(AFABasePassenger* PassengerToLetIn);
 
 	UFUNCTION(BlueprintCallable)
+	UPassengersManagerComponent* GetPassengerManager() const { return PassengersManager; }
+
+	UFUNCTION(BlueprintCallable)
 	UCargoManagerComponent* GetCargoManager() const { return CargoDeliveryManager; }
 
 	UFUNCTION(BlueprintCallable)
 	UPDAMessengerComponent* GetPDAMessenger() const { return PDAMessenger; }
 
-	USpacePlane* GetSpacePlane() const { return SpacePlane; }
+	USpacePlaneComponent* GetSpacePlane() const { return SpacePlane; }
 
 	void ShowCargoPickMenu() const;
 	
@@ -89,7 +92,8 @@ protected:
 	UMapGraph* WorldMap = nullptr;
 	// Player's spaceship abstraction
 	UPROPERTY(BlueprintReadOnly)
-	USpacePlane* SpacePlane = nullptr;
+	USpacePlaneComponent* SpacePlane = nullptr;
+	
 	// Quests taken by player.
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UQuest*> TakenQuests;

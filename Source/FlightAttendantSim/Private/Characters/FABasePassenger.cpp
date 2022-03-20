@@ -3,7 +3,9 @@
 
 #include "Characters/FABasePassenger.h"
 
+#include "FAGameMode.h"
 #include "PassengerSeat.h"
+#include "PassengersManagerComponent.h"
 #include "WorldMap/LocationInfo.h"
 
 FText AFABasePassenger::GetParticipantCustomText_Implementation(FName ValueName) const
@@ -22,16 +24,17 @@ FText AFABasePassenger::GetParticipantCustomText_Implementation(FName ValueName)
 		}
 	}
 	
-	UE_LOG(LogTemp, Error,
-		TEXT("Unknown custom text name %s on %s participant"),
-		*ValueName.ToString(),
-		*GetParticipantName().ToString());
 	return Super::GetParticipantCustomText_Implementation(ValueName);
 }
 
-void AFABasePassenger::ShowDocuments() const
+void AFABasePassenger::ShowDocuments_Implementation() const
 {
-	// TODO: Show documents
+	// PLACEHOLDER
+}
+
+void AFABasePassenger::UnShowDocuments_Implementation(bool IsApproved) const
+{
+	// PLACEHOLDER
 }
 
 void AFABasePassenger::AssignPassengerSeat(APassengerSeat* PassengerSeat)
@@ -46,4 +49,21 @@ void AFABasePassenger::DeassignPassengerSeat()
 	if (AssignedPassengerSeat)
 		AssignedPassengerSeat->DeassignCharacter();
 	AssignedPassengerSeat = nullptr;
+}
+
+void AFABasePassenger::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// If passenger was placed on the scene in editor then DocumentsInfo is not initialized
+	// So I proceed it here
+	if (DocumentsInfo.PassengerId.Len() == 0)
+	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			DocumentsInfo =
+				Cast<AFAGameMode>(World->GetAuthGameMode())->GetPassengerManager()->CreateDocument();
+		}
+	}
 }

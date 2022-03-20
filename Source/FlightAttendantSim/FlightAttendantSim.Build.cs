@@ -29,8 +29,11 @@ public class FlightAttendantSim : ModuleRules
 			"FlightAttendantSim/Public/Characters",
 			"FlightAttendantSim/Public/Characters/Actions",
 			"FlightAttendantSim/Public/Characters/Passengers",
+			"FlightAttendantSim/Public/Characters/Workers",
+			"FlightAttendantSim/Public/Characters/Workers/Events",
 			"FlightAttendantSim/Public/SpacePlane",
-			"FlightAttendantSim/Public/CargoDelivery"
+			"FlightAttendantSim/Public/CargoDelivery",
+			"FlightAttendantSim/Public/Flight"
 		});
 
 		// Uncomment if you are using Slate UI

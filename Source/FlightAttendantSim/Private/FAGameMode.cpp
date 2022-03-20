@@ -12,7 +12,7 @@
 #include "Quests/Quest.h"
 #include "Characters/FABaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "SpacePlane/SpacePlane.h"
+#include "SpacePlane/SpacePlaneComponent.h"
 #include "Characters/FABasePassenger.h"
 #include "Components/PassengersManagerComponent.h"
 #include "Components/CargoManagerComponent.h"
@@ -26,6 +26,8 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<UCargoManagerComponent>("CargoDeliveryManagerComponent");
 	PDAMessenger =
 		CreateDefaultSubobject<UPDAMessengerComponent>("PDAMessengerComponent");
+	SpacePlane =
+		CreateDefaultSubobject<USpacePlaneComponent>("SpacePlaneComponent");
 }
 
 void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -33,10 +35,6 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 	Super::InitGame(MapName, Options, ErrorMessage);
 
 	DebugCharactersSpawnLocations.Empty();
-	SpacePlane = NewObject<USpacePlane>(this);
-	// Must initialize cargo cell here because UI somehow needs it before GameMode's Begin Play is called.
-	if (SpacePlane)
-		SpacePlane->CreateCargoCell();
 
 	{ // TODO: Decompose to protected func
 		const UAssetManager& AssetManager = UAssetManager::Get();

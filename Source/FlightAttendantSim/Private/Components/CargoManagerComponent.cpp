@@ -4,9 +4,9 @@
 #include "Components/CargoManagerComponent.h"
 
 #include "WorldMap/MapNode.h"
-#include "SpacePlane/CargoCell.h"
+#include "SpacePlane/CargoCellComponent.h"
 #include "FAGameMode.h"
-#include "SpacePlane/SpacePlane.h"
+#include "SpacePlane/SpacePlaneComponent.h"
 
 
 // Sets default values for this component's properties
@@ -45,11 +45,11 @@ bool UCargoManagerComponent::TakeCargoDeliveryOffer(const FCargoInfo& Cargo)
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		USpacePlane* SpacePlane =
+		USpacePlaneComponent* SpacePlane =
 			Cast<AFAGameMode>(World->GetAuthGameMode())->GetSpacePlane();
 		if (SpacePlane)
 		{
-			UCargoCell* CargoCell = SpacePlane->GetCargoCell();
+			UCargoCellComponent* CargoCell = SpacePlane->GetCargoCell();
 			if (CargoCell)
 			{
 				const bool Success =

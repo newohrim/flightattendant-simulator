@@ -18,7 +18,10 @@ class FLIGHTATTENDANTSIM_API AFABasePassenger : public AFABaseCharacter
 public:
 	virtual FText GetParticipantCustomText_Implementation(FName ValueName) const override;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ShowDocuments() const;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UnShowDocuments(bool IsApproved) const;
 
 	void AssignPassengerSeat(APassengerSeat* PassengerSeat);
 	void DeassignPassengerSeat();
@@ -33,4 +36,6 @@ protected:
 	APassengerSeat* AssignedPassengerSeat;
 	UPROPERTY(BlueprintReadOnly)
 	FDocsInfo DocumentsInfo;
+
+	virtual void BeginPlay() override;
 };

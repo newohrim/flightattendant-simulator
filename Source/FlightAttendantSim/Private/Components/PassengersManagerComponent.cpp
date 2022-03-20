@@ -67,7 +67,7 @@ FDocsInfo UPassengersManagerComponent::CreateDocument() const
 	{
 		LastNames[FMath::RandHelper(LastNames.Num())],
 		FirstNames[FMath::RandHelper(FirstNames.Num())],
-		FMath::RandRange(MinPassengerId, MaxPassengerId)
+		FDocsInfo::GenerateId()
 	};
 }
 

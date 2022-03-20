@@ -21,6 +21,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	AFABasePassenger* CreatePassenger(const FTransform& PassengerTransform, ULocationInfo* Destination);
+
+	FDocsInfo CreateDocument() const;
 	
 	void ClearPassengers();
 
@@ -41,8 +43,6 @@ protected:
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	FDocsInfo CreateDocument() const;
 
 private:
 	TArray<FString> LastNames;

@@ -19,7 +19,6 @@ public:
 	// The display name of the location
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText LocationName;
-	// TODO: Fix duplication of facilities list in MapNode.h
 	// Facilities situated on the location
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TEnumAsByte<EFacilityType>> Facilities;

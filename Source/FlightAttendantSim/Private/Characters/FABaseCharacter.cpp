@@ -80,6 +80,10 @@ FText AFABaseCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpe
 
 FText AFABaseCharacter::GetParticipantCustomText_Implementation(FName ValueName) const
 {
+	UE_LOG(LogTemp, Error,
+		TEXT("Unknown custom text name %s on %s participant"),
+		*ValueName.ToString(),
+		*Execute_GetParticipantName(this).ToString());
 	return FText::FromString("");
 }
 

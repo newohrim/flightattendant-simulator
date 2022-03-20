@@ -19,5 +19,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString FirstName;
 	UPROPERTY(BlueprintReadOnly)
-	int32 PassengerId;
+	FString PassengerId;
+
+	static FString GenerateId();
 };

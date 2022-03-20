@@ -76,7 +76,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestInfo")
 	FString QuestName;
-	// TODO: Create character abstraction with all info on how and where to spawn him and move the name there.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestInfo")
 	FString ClientName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (MultiLine="true"), Category = "QuestInfo")
