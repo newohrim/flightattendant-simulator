@@ -3,6 +3,7 @@
 
 #include "FAGameMode.h"
 
+#include "FlightControlComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Characters/Actions/CharacterSitAction.h"
 #include "Characters/Actions/CharacterMoveAction.h"
@@ -26,6 +27,8 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<UCargoManagerComponent>("CargoDeliveryManagerComponent");
 	PDAMessenger =
 		CreateDefaultSubobject<UPDAMessengerComponent>("PDAMessengerComponent");
+	FlightController =
+		CreateDefaultSubobject<UFlightControlComponent>("FlightControlComponent");
 	SpacePlane =
 		CreateDefaultSubobject<USpacePlaneComponent>("SpacePlaneComponent");
 }

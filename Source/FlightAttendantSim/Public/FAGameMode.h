@@ -16,6 +16,7 @@ class USpacePlaneComponent;
 class UPassengersManagerComponent;
 class UCargoManagerComponent;
 class UPDAMessengerComponent;
+class UFlightControlComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 
@@ -57,6 +58,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UPDAMessengerComponent* GetPDAMessenger() const { return PDAMessenger; }
 
+	UFlightControlComponent* GetFlightController() const { return FlightController; }
+
 	USpacePlaneComponent* GetSpacePlane() const { return SpacePlane; }
 
 	void ShowCargoPickMenu() const;
@@ -86,6 +89,8 @@ protected:
 	UCargoManagerComponent* CargoDeliveryManager;
 	UPROPERTY(EditDefaultsOnly)
 	UPDAMessengerComponent* PDAMessenger;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UFlightControlComponent* FlightController;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
