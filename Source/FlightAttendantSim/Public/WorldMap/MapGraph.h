@@ -9,6 +9,7 @@
 
 class UMapNode;
 class UQuest;
+class ITreeLayoutDrawer;
 
 typedef TIndexedContainerIterator<TArray<UQuest*>, UQuest*, TArray<UQuest*>::SizeType> TQuestIterator;
 
@@ -21,6 +22,8 @@ class FLIGHTATTENDANTSIM_API UMapGraph : public UObject
 	GENERATED_BODY()
 	
 public:
+	virtual void BeginDestroy() override;
+	
 	void GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace);
 	int32 GetCurrentDepth() const;
 	int32 GetGraphDepth() const;
@@ -49,6 +52,8 @@ protected:
 	UMapNode* RootNode;
 	UPROPERTY()
 	UMapNode* CurrentNode;
+
+	ITreeLayoutDrawer* TreeDrawer = nullptr;
 
 private:
 	int32 CurrentMaxDepth = 0;

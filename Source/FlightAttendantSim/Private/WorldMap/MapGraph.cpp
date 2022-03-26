@@ -4,10 +4,22 @@
 #include "WorldMap/MapGraph.h"
 
 #include "LocationInfo.h"
+#include "WorldMap/TreeLayoutDrawing/TreeLayoutDrawer.h"
+#include "WorldMap/TreeLayoutDrawing/TreeLayeredLayoutDrawer.h"
 #include "WorldMap/MapNode.h"
+
+void UMapGraph::BeginDestroy()
+{
+	UObject::BeginDestroy();
+
+	delete TreeDrawer;
+}
 
 void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 {
+	// Manual cleanup is in BeginDestroy()
+	TreeDrawer = new FTreeLayeredLayoutDrawer();
+	
 	this->MaxDepth = Depth;
 
 	RootNode = NewObject<UMapNode>(this);
@@ -36,15 +48,18 @@ void UMapGraph::ExpandNode(UMapNode* Node, const TArray<UQuest*>& QuestsToPlace)
 	if (Node->GetChildNodes().Num() > 0)
 		return;
 
-	// TODO: Must generate map based on current QuestIterator
 	Node->GenerateChildrenNodes(QuestsToPlace, Node->GetDepth() + 1);
 	//FixIntersections(Node);
-	int32 X = 0;
-	RootNode->MakeGridLayout(X);
+	//int32 X = 0;
+	//RootNode->MakeGridLayout(X);
 	// Max height is in X after MakeGridLayout call, so I make a half offset
-	CurrentMaxHeight = X / 2;
-	CurrentMaxDepth = GetGraphDepth();
-	RootNode->UpdateHeightLevels(-CurrentMaxHeight - (RootNode->GetHeightLevel() - CurrentMaxHeight));
+	//CurrentMaxHeight = X / 2;
+	//CurrentMaxDepth = GetGraphDepth();
+	//RootNode->UpdateHeightLevels(-CurrentMaxHeight - (RootNode->GetHeightLevel() - CurrentMaxHeight));
+	if (TreeDrawer)
+	{
+		TreeDrawer->MakeGridLayout(RootNode);
+	}
 	NodesPairs.Empty();
 	RootNode->GetConnectedPairs(NodesPairs);
 }

@@ -26,6 +26,7 @@ public class FlightAttendantSim : ModuleRules
 			"FlightAttendantSim/Public/Components", 
 			"FlightAttendantSim/Public/Quests",
 			"FlightAttendantSim/Public/WorldMap",
+			"FlightAttendantSim/Public/WorldMap/TreeLayoutDrawing",
 			"FlightAttendantSim/Public/Characters",
 			"FlightAttendantSim/Public/Characters/Actions",
 			"FlightAttendantSim/Public/Characters/Passengers",
