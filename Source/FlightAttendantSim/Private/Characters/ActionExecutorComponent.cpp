@@ -40,7 +40,8 @@ void UActionExecutorComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	Actions[ActiveIndex]->TickAction(DeltaTime, LinkedCharacter);
+	if (!IsPaused)
+		Actions[ActiveIndex]->TickAction(DeltaTime, LinkedCharacter);
 }
 
 void UActionExecutorComponent::ExecuteActions()
@@ -55,6 +56,19 @@ void UActionExecutorComponent::ExecuteActions()
 	Actions[ActiveIndex]->ActionComplete
 			.BindUObject(this, &UActionExecutorComponent::NextAction);
 	SetComponentTickEnabled(true);
+}
+
+void UActionExecutorComponent::PauseCurrentAction()
+{
+	SetComponentTickEnabled(false);
+	IsPaused = true;
+}
+
+void UActionExecutorComponent::ResumeCurrentAction()
+{
+	if (Actions.Num() > 0)
+		SetComponentTickEnabled(true);
+	IsPaused = false;
 }
 
 void UActionExecutorComponent::NextAction()
@@ -74,6 +88,7 @@ void UActionExecutorComponent::NextAction()
 
 void UActionExecutorComponent::CompleteActions()
 {
+	// May awake memory leak here?
 	Actions.Empty();
 	SetComponentTickEnabled(false);
 	ActionsComplete.ExecuteIfBound();

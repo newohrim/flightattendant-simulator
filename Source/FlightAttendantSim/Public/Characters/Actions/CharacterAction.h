@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Object.h"
 #include "CharacterAction.generated.h"
 
 class AFABaseCharacter;
@@ -13,8 +14,8 @@ DECLARE_DELEGATE(FActionFailed);
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct FCharacterAction
+UCLASS(BlueprintType, Blueprintable, Abstract, EditInlineNew)
+class FLIGHTATTENDANTSIM_API UCharacterAction : public UObject
 {
 	GENERATED_BODY()
 
@@ -22,8 +23,6 @@ public:
 	FActionComplete ActionComplete;
 	FActionFailed ActionFailed;
 
-	FCharacterAction() {}
-	virtual ~FCharacterAction() {}
 	virtual void TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform) { }
 	
 protected:

@@ -18,6 +18,7 @@
 #include "Components/PassengersManagerComponent.h"
 #include "Components/CargoManagerComponent.h"
 #include "Components/PDAMessengerComponent.h"
+#include "Components/GameEconomyComponent.h"
 
 AFAGameMode::AFAGameMode()
 {
@@ -27,10 +28,23 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<UCargoManagerComponent>("CargoDeliveryManagerComponent");
 	PDAMessenger =
 		CreateDefaultSubobject<UPDAMessengerComponent>("PDAMessengerComponent");
-	FlightController =
-		CreateDefaultSubobject<UFlightControlComponent>("FlightControlComponent");
 	SpacePlane =
 		CreateDefaultSubobject<USpacePlaneComponent>("SpacePlaneComponent");
+	EconomyComponent =
+		CreateDefaultSubobject<UGameEconomyComponent>("EconomyComponent");
+
+	const AFAGameMode* DefaultObject = Cast<AFAGameMode>(GetClass()->GetDefaultObject());
+	const TSubclassOf<UFlightControlComponent> DefaultClass = DefaultObject->DefaultFlightControllerClass;
+	if (DefaultClass)
+	{
+		FlightController = Cast<UFlightControlComponent>(
+		CreateDefaultSubobject(
+			TEXT("FlightControlComponent"),
+			UFlightControlComponent::StaticClass(),
+			*DefaultClass,
+			true,
+			false));
+	}         
 }
 
 void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -60,10 +74,7 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 			}
 		}
 	}
-
-	// Not sure where to call
-	LocationLoadedHandle();
-
+	
 	TArray<UQuest*> QuestsToPlace = SampleQuestList(MaxNodeChildren);
 
 	WorldMap = NewObject<UMapGraph>(this);
@@ -72,6 +83,9 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 		WorldMap->GenerateMap(WorldMapMaxDepth, QuestsToPlace);
 	}
 	UpdatePlacedQuests(WorldMap->GetRootNode(), QuestsToPlace);
+
+	// Not sure where to call
+	LocationLoadedHandle();
 }
 
 void AFAGameMode::BeginPlay()
@@ -95,9 +109,9 @@ void AFAGameMode::LocationLoadedHandle()
 {
 	// TODO: In fact I also need to init their structure at the moment they got taken by Player.
 	// Updating all quests structure.
-	for (UQuest* TakenQuest : TakenQuests)
+	for (UQuest* PlacedQuest : PlacedQuests)
 	{
-		TakenQuest->Init();
+		PlacedQuest->Init();
 	}
 	// Available quests as well, cause may need to. Not sure.
 	for (UQuest* AvailableQuest : AvailableQuests)
@@ -116,19 +130,12 @@ void AFAGameMode::AddTakenQuest(UQuest* TakenQuest)
 
 void AFAGameMode::TakeQuest(TSubclassOf<UQuest> TakenQuest)
 {
-	for (UQuest* Quest : PlacedQuests)
+	UQuest* Quest = GetQuestFromClass(TakenQuest);
+	if (Quest)
 	{
-		if (Quest->IsA(TakenQuest.Get()))
-		{
-			Quest->TakeQuest();
-			AddTakenQuest(Quest);
-			return;
-		}
+		Quest->TakeQuest();
+		AddTakenQuest(Quest);
 	}
-
-	UE_LOG(LogTemp, Error,
-		TEXT("%s quest wasn't recognise in PlacedQuests and was not taken."),
-		*(TakenQuest.Get()->GetFullName()));
 }
 
 void AFAGameMode::RemoveFinishedQuest(UQuest* FinishedQuest)
@@ -216,8 +223,8 @@ void AFAGameMode::LetPassengerInPlane(AFABasePassenger* PassengerToLetIn)
 		UActionExecutorComponent* ActionExecutor = PassengerToLetIn->GetActionExecutorComponent();
 		ActionExecutor->SetActions(
 		{
-			new FCharacterMoveAction(MoveToSeatLocation),
-			new FCharacterSitAction(PassengerToLetIn->GetAssignedPassengerSeat())
+			UCharacterMoveAction::CreateCharacterMoveAction(MoveToSeatLocation, ActionExecutor),
+			UCharacterSitAction::CreateCharacterSitAction(PassengerToLetIn->GetAssignedPassengerSeat(), ActionExecutor)
 		});
 		ActionExecutor->ExecuteActions();
 	}
@@ -226,6 +233,36 @@ void AFAGameMode::LetPassengerInPlane(AFABasePassenger* PassengerToLetIn)
 		UE_LOG(LogTemp, Warning,
 			TEXT("LetPassengerInPlane was called, but there were no free seats."));
 	}
+}
+
+UQuest* AFAGameMode::GetQuestFromClass(TSubclassOf<UQuest> QuestClass) const
+{
+	for (UQuest* Quest : TakenQuests)
+	{
+		if (Quest->IsA(QuestClass.Get()))
+		{
+			return Quest;
+		}
+	}
+	for (UQuest* Quest : PlacedQuests)
+	{
+		if (Quest->IsA(QuestClass.Get()))
+		{
+			return Quest;
+		}
+	}
+	for (UQuest* Quest : AvailableQuests)
+	{
+		if (Quest->IsA(QuestClass.Get()))
+		{
+			return Quest;
+		}
+	}
+	
+	UE_LOG(LogTemp, Error,
+		TEXT("%s quest wasn't recognise in FAGameMode's Quest Lists."),
+		*(QuestClass.Get()->GetFullName()));
+	return nullptr;
 }
 
 void AFAGameMode::ShowCargoPickMenu() const

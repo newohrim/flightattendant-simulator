@@ -44,20 +44,26 @@ EPathFollowingRequestResult::Type AFABaseCharacter::MoveTo(const FVector TargetL
 
 void AFABaseCharacter::SitOnSeat(ASeat* Seat)
 {
-	IsSitting = true;
-	CurrentSeat = Seat;
-	const FVector StaticPos = Seat->GetMoveToLocation().GetLocation();
-	// Prevent player from falling through the ground
-	GetCharacterMovement()->GravityScale = 0.0f;
-	SetActorLocationAndRotation(FVector(StaticPos.X, StaticPos.Y, GetActorLocation().Z),
-		Seat->GetMoveToLocation().Rotator());
+	if (!IsSitting)
+	{
+		IsSitting = true;
+		CurrentSeat = Seat;
+		const FVector StaticPos = Seat->GetMoveToLocation().GetLocation();
+		// Prevent player from falling through the ground
+		GetCharacterMovement()->GravityScale = 0.0f;
+		SetActorLocationAndRotation(FVector(StaticPos.X, StaticPos.Y, GetActorLocation().Z),
+			Seat->GetMoveToLocation().Rotator());
+	}
 }
 
 void AFABaseCharacter::StandFromSeat()
 {
-	IsSitting = false;
-	CurrentSeat = nullptr;
-	PlayAnimMontage(SitToStandAnim);
+	if (IsSitting)
+	{
+		IsSitting = false;
+		CurrentSeat = nullptr;
+		PlayAnimMontage(SitToStandAnim);
+	}
 }
 
 // Called when the game starts or when spawned

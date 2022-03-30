@@ -33,7 +33,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced)
 	ULocationInfo* LocationHeadingTo;
 	UPROPERTY(BlueprintReadOnly)
-	APassengerSeat* AssignedPassengerSeat;
+	APassengerSeat* AssignedPassengerSeat = nullptr;
 	UPROPERTY(BlueprintReadOnly)
 	FDocsInfo DocumentsInfo;
 

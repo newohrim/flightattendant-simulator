@@ -4,12 +4,7 @@
 #include "Characters/Actions/CharacterMoveAction.h"
 #include "Characters/FABaseCharacter.h"
 
-FCharacterMoveAction::FCharacterMoveAction(const FVector MoveToLocation)
-{
-	TargetLocation = MoveToLocation;
-}
-
-void FCharacterMoveAction::TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform)
+void UCharacterMoveAction::TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform)
 {
 	auto Result = CharacterToPerform->MoveTo(TargetLocation);
 	if (Result == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -21,4 +16,11 @@ void FCharacterMoveAction::TickAction(const float DeltaTime, AFABaseCharacter* C
 	{
 		FailAction();
 	}
+}
+
+UCharacterMoveAction* UCharacterMoveAction::CreateCharacterMoveAction(const FVector Location, UObject* Outer)
+{
+	UCharacterMoveAction* MoveAction = NewObject<UCharacterMoveAction>(Outer);
+	MoveAction->TargetLocation = Location;
+	return MoveAction;
 }

@@ -3,22 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CharacterAction.h"
+#include "Characters/Actions/CharacterAction.h"
 #include "CharacterMoveAction.generated.h"
 
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct FCharacterMoveAction : public FCharacterAction
+UCLASS(BlueprintType)
+class UCharacterMoveAction : public UCharacterAction
 {
 	GENERATED_BODY()
 
 public:
-	FCharacterMoveAction() = default;
-	FCharacterMoveAction(const FVector MoveToLocation);
 	virtual void TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static UCharacterMoveAction* CreateCharacterMoveAction(FVector Location, UObject* Outer);
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector TargetLocation;
 };

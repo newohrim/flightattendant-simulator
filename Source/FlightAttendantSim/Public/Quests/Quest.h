@@ -41,7 +41,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UQuestNode* CreateNode() { return NewObject<UQuestNode>(this); }
 	UFUNCTION(BlueprintCallable)
-	void SetCurrentNode(UQuestNode* Node) { CurrentNode = Node; }
+	void SetCurrentNode(UQuestNode* Node);
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetCurrentGoals() const;
 	UFUNCTION(BlueprintCallable)
@@ -93,4 +93,10 @@ protected:
 	bool IsFamiliar = false;
 	
 	UFAGameInstance* GetFAGameInstance() const;
+
+	UFUNCTION(BlueprintCallable)
+	AGameModeBase* GetGameModeHelper() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static AGameModeBase* GetGameModeHelperStatic(const UObject* Outer);
 };

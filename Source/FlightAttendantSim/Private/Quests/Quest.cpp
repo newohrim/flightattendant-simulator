@@ -18,6 +18,12 @@ UQuest::UQuest()
 	UE_LOG(LogTemp, Display, TEXT("%s"), *GetFullName());
 }
 
+void UQuest::SetCurrentNode(UQuestNode* Node)
+{
+	CurrentNode = Node;
+	CurrentNode->ExecutePreEvents();
+}
+
 TArray<FString> UQuest::GetCurrentGoals() const
 {
 	return CurrentNode->GetNodeGoals();
@@ -49,7 +55,8 @@ void UQuest::ChangeNode(UQuestTransition* ExecutedTransition)
 	{
 		ExecutedTransition->ExecutePostEvents();
 		CurrentNode->NodeCompleted.Unbind();
-		CurrentNode = ExecutedTransition->GetTargetNode();
+		//CurrentNode = ExecutedTransition->GetTargetNode();
+		SetCurrentNode(ExecutedTransition->GetTargetNode());
 		if (CurrentNode->IsLast())
 		{
 			FinishQuest();
@@ -96,4 +103,14 @@ UFAGameInstance* UQuest::GetFAGameInstance() const
 		return nullptr;
 	}
 	return Cast<UFAGameInstance>(GameInstance);
+}
+
+AGameModeBase* UQuest::GetGameModeHelper() const
+{
+	return GetGameModeHelperStatic(this);
+}
+
+AGameModeBase* UQuest::GetGameModeHelperStatic(const UObject* Outer)
+{
+	return UGameplayStatics::GetGameMode(Outer->GetWorld());
 }

@@ -43,11 +43,20 @@ AFABasePassenger* UPassengersManagerComponent::CreatePassenger(const FTransform&
 
 void UPassengersManagerComponent::ClearPassengers()
 {
-	for (int i = 0; i < SpawnedPassengers.Num(); ++i)
+	TArray<int32> DestroyedActors;
+	for (int32 i = 0; i < SpawnedPassengers.Num(); ++i)
 	{
-		SpawnedPassengers[i]->Destroy();
+		if (SpawnedPassengers[i]->GetAssignedPassengerSeat() == nullptr)
+		{
+			SpawnedPassengers[i]->Destroy();
+			DestroyedActors.Add(i);
+		}
 	}
-	SpawnedPassengers.Empty();
+	for (int32 i = DestroyedActors.Num() - 1; i >= 0; --i)
+	{
+		SpawnedPassengers.RemoveAt(DestroyedActors[i], 1, false);
+	}
+	SpawnedPassengers.Shrink();
 }
 
 // Called when the game starts

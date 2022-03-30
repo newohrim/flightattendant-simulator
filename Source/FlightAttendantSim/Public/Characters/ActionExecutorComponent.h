@@ -25,16 +25,30 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SetActions(const TArray<FCharacterAction*> ActionsToSet) { Actions = ActionsToSet; }
+	UFUNCTION(BlueprintCallable)
+	void SetActions(const TArray<UCharacterAction*>& ActionsToSet) { Actions = ActionsToSet; }
+	
 	UFUNCTION(BlueprintCallable)
 	void ExecuteActions();
 
+	UFUNCTION(BlueprintCallable)
+	void PauseCurrentAction();
+
+	UFUNCTION(BlueprintCallable)
+	void ResumeCurrentAction();
+
 protected:
+	bool IsPaused = false;
+	
 	int32 ActiveIndex = 0;
-	TArray<FCharacterAction*> Actions;
+	
+	UPROPERTY()
+	TArray<UCharacterAction*> Actions;
+	
 	UPROPERTY()
 	AFABaseCharacter* LinkedCharacter;
 
 	void NextAction();
+	
 	void CompleteActions();
 };

@@ -15,7 +15,7 @@ class FLIGHTATTENDANTSIM_API UScheduleMessageEvent : public USendMessageEvent
 	GENERATED_BODY()
 
 public:
-	virtual void Execute() override;
+	virtual void Execute_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static UScheduleMessageEvent* CreateScheduleMessageEvent(

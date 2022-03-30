@@ -16,7 +16,7 @@ class FLIGHTATTENDANTSIM_API USendMessageEvent : public UTransitionEvent
 	GENERATED_BODY()
 
 public:
-	virtual void Execute() override;
+	virtual void Execute_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static USendMessageEvent* CreateSendMessageEvent(

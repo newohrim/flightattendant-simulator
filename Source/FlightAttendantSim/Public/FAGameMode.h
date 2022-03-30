@@ -17,6 +17,7 @@ class UPassengersManagerComponent;
 class UCargoManagerComponent;
 class UPDAMessengerComponent;
 class UFlightControlComponent;
+class UGameEconomyComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 
@@ -50,6 +51,9 @@ public:
 	void LetPassengerInPlane(AFABasePassenger* PassengerToLetIn);
 
 	UFUNCTION(BlueprintCallable)
+	UQuest* GetQuestFromClass(TSubclassOf<UQuest> QuestClass) const;
+
+	UFUNCTION(BlueprintCallable)
 	UPassengersManagerComponent* GetPassengerManager() const { return PassengersManager; }
 
 	UFUNCTION(BlueprintCallable)
@@ -59,6 +63,8 @@ public:
 	UPDAMessengerComponent* GetPDAMessenger() const { return PDAMessenger; }
 
 	UFlightControlComponent* GetFlightController() const { return FlightController; }
+
+	UGameEconomyComponent* GetEconomyComponent() const { return EconomyComponent; }
 
 	USpacePlaneComponent* GetSpacePlane() const { return SpacePlane; }
 
@@ -79,6 +85,9 @@ protected:
 	TArray<AActor*> DebugPassengersSpawnLocations;
 
 	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UFlightControlComponent> DefaultFlightControllerClass;
+
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> CargoPickMenuWidgetClass;
 	UPROPERTY(BlueprintReadOnly)
 	UUserWidget* CargoPickMenuWidget = nullptr;
@@ -91,6 +100,8 @@ protected:
 	UPDAMessengerComponent* PDAMessenger;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UFlightControlComponent* FlightController;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UGameEconomyComponent* EconomyComponent;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)

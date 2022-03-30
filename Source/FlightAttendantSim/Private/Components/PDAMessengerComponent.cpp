@@ -17,7 +17,7 @@ UPDAMessengerComponent::UPDAMessengerComponent()
 void UPDAMessengerComponent::AddMessage(const FPDAMessage Message)
 {
 	ReceivedMessages.Add(Message);
-	MessageReceived.Broadcast();
+	MessageReceived.Broadcast(Message);
 }
 
 void UPDAMessengerComponent::AddScheduledMessage(const FPDAMessage& ScheduledMessage, const float TimeToWait)

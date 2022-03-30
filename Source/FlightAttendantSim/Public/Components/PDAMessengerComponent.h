@@ -7,7 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "PDAMessengerComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMessageReceived);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageReceived, const FPDAMessage&, RecievedMessage);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIGHTATTENDANTSIM_API UPDAMessengerComponent : public UActorComponent

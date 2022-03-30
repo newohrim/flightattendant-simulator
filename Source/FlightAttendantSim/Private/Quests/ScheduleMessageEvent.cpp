@@ -6,7 +6,7 @@
 #include "FAGameMode.h"
 #include "Components/PDAMessengerComponent.h"
 
-void UScheduleMessageEvent::Execute()
+void UScheduleMessageEvent::Execute_Implementation()
 {
 	UWorld* World = GetWorld();
 	if (World)

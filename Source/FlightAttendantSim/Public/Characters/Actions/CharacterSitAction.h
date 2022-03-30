@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CharacterAction.h"
+#include "Characters/Actions/CharacterAction.h"
 #include "CharacterSitAction.generated.h"
 
 class ASeat;
@@ -11,17 +11,18 @@ class ASeat;
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct FCharacterSitAction : public FCharacterAction
+UCLASS(BlueprintType)
+class UCharacterSitAction : public UCharacterAction
 {
 	GENERATED_BODY()
 
 public:
-	FCharacterSitAction() = default;
-	FCharacterSitAction(ASeat* Seat);
 	virtual void TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static UCharacterSitAction* CreateCharacterSitAction(ASeat* Seat, UObject* Outer);
+
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ASeat* SeatToSitOn;
 };

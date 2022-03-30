@@ -8,7 +8,7 @@
 
 class AFABaseCharacter;
 
-UCLASS()
+UCLASS(BlueprintType)
 class FLIGHTATTENDANTSIM_API ASeat : public AActor
 {
 	GENERATED_BODY()

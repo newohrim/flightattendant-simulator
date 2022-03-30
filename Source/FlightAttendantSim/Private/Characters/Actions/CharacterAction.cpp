@@ -4,12 +4,12 @@
 #include "Characters/Actions/CharacterAction.h"
 #include "Characters/FABaseCharacter.h"
 
-bool FCharacterAction::CompleteAction() const
+bool UCharacterAction::CompleteAction() const
 {
 	return ActionComplete.ExecuteIfBound();
 }
 
-bool FCharacterAction::FailAction() const
+bool UCharacterAction::FailAction() const
 {
 	return ActionFailed.ExecuteIfBound();
 }

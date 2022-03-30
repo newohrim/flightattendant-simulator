@@ -4,12 +4,7 @@
 #include "Characters/Actions/CharacterSitAction.h"
 #include "Characters/FABaseCharacter.h"
 
-FCharacterSitAction::FCharacterSitAction(ASeat* Seat)
-{
-	SeatToSitOn = Seat;
-}
-
-void FCharacterSitAction::TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform)
+void UCharacterSitAction::TickAction(const float DeltaTime, AFABaseCharacter* CharacterToPerform)
 {
 	if (!SeatToSitOn)
 	{
@@ -22,4 +17,11 @@ void FCharacterSitAction::TickAction(const float DeltaTime, AFABaseCharacter* Ch
 	CharacterToPerform->SitOnSeat(SeatToSitOn);
 	if (!ActionComplete.ExecuteIfBound())
 		ActionFailed.ExecuteIfBound();
+}
+
+UCharacterSitAction* UCharacterSitAction::CreateCharacterSitAction(ASeat* Seat, UObject* Outer)
+{
+	UCharacterSitAction* SitAction = NewObject<UCharacterSitAction>(Outer);
+	SitAction->SeatToSitOn = Seat;
+	return SitAction;
 }

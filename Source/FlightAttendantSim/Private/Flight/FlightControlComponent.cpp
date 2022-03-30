@@ -3,6 +3,7 @@
 
 #include "Flight/FlightControlComponent.h"
 
+#include "WorldMap/MapNode.h"
 
 // Sets default values for this component's properties
 UFlightControlComponent::UFlightControlComponent()
@@ -14,22 +15,29 @@ UFlightControlComponent::UFlightControlComponent()
 	// ...
 }
 
-void UFlightControlComponent::StartFlight()
+void UFlightControlComponent::StartFlight(UMapNode* Destination)
 {
+	DestinationNode = Destination;
+	
 	UWorld* World = GetWorld();
 	if (World)
 	{
 		FTimerDelegate FlightTimerDel;
 		FlightTimerDel.BindUObject(this, &UFlightControlComponent::EndFlight);
 		World->GetTimerManager().SetTimer(FlightTimer, FlightTimerDel, FlightDuration, false);
-		
+
+		if (DestinationNode.IsValid())
+			PlayerStartTravel.Broadcast(Destination);
 		OnFlightStart();
 	}
 }
 
 void UFlightControlComponent::EndFlight()
 {
-	// passengers leave plane?
+	if (DestinationNode.IsValid())
+		PlayerArrived.Broadcast(DestinationNode.Get());
+	
+	// TODO: passengers leave plane?
 	
 	OnFlightEnd();
 }

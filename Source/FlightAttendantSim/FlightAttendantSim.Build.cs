@@ -25,6 +25,8 @@ public class FlightAttendantSim : ModuleRules
 		{
 			"FlightAttendantSim/Public/Components", 
 			"FlightAttendantSim/Public/Quests",
+			"FlightAttendantSim/Public/Quests/Transitions",
+			"FlightAttendantSim/Public/Quests/TransitionEvents",
 			"FlightAttendantSim/Public/WorldMap",
 			"FlightAttendantSim/Public/WorldMap/TreeLayoutDrawing",
 			"FlightAttendantSim/Public/Characters",

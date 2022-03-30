@@ -2,3 +2,8 @@
 
 
 #include "Quests/TransitionEvent.h"
+
+void UTransitionEvent::Execute_Implementation()
+{
+	// PLACEHOLDER
+}
