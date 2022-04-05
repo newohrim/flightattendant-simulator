@@ -35,13 +35,33 @@ public:
 	FQuestFinished QuestFinished;
 	
 	UQuest();
+	
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EQuestStatus> QuestStatus = EQuestStatus::Waiting;
 
 	UFUNCTION(BlueprintCallable)
-	UQuestNode* CreateNode() { return NewObject<UQuestNode>(this); }
+	UQuestNode* CreateNode()
+	{  
+		return CreateNodeIndexed(++LastNodeIndex);
+	}
+	UFUNCTION(BlueprintCallable)
+	UQuestNode* CreateNodeIndexed(const int32 Index)
+	{
+		UQuestNode* Node = NewObject<UQuestNode>(this);
+		Node->SetNodeIndex(Index);
+		if (Index == CurrentNodeIndex)
+		{
+			SetCurrentNode(Node);
+		}
+		return Node;
+	}
+	UFUNCTION(BlueprintCallable)
+	UQuestNode* GetCurrentNode() const { return CurrentNode; }
+	// TODO: Move PreEvents call logic to ReconstructQuest()
+	// Call only when all PreEvents for this node are set!
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentNode(UQuestNode* Node);
+	void SetCurrentNodeIndex(const int32 NodeIndex) { CurrentNodeIndex = NodeIndex; }
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetCurrentGoals() const;
 	UFUNCTION(BlueprintCallable)
@@ -57,6 +77,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetIsFamiliar(bool Value) { IsFamiliar = Value; }
 
+	void ReconstructQuest();
+	// TODO: Make protected?
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Init();
 	UFUNCTION(BlueprintCallable)
@@ -91,6 +113,12 @@ protected:
 	// It could be if player talked to one of the quest characters.
 	UPROPERTY(BlueprintReadOnly)
 	bool IsFamiliar = false;
+
+	// Unique identifier of current node. Used for determine the actual current node. See CreateNode().
+	int32 CurrentNodeIndex = -1;
+	
+	// Node index counter. Increments every time a new node gets created.
+	int32 LastNodeIndex = -1;
 	
 	UFAGameInstance* GetFAGameInstance() const;
 

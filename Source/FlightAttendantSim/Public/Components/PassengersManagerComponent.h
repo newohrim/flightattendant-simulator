@@ -24,7 +24,7 @@ public:
 
 	FDocsInfo CreateDocument() const;
 	
-	void ClearPassengers();
+	void ClearRedundantPassengers();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "FilePaths")

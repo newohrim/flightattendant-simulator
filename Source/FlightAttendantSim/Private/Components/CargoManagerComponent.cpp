@@ -21,6 +21,9 @@ UCargoManagerComponent::UCargoManagerComponent()
 
 void UCargoManagerComponent::GenerateCargoes(const UMapNode* NodeFor)
 {
+	if (!NodeFor)
+		return;
+	
 	Cargoes.Empty();
 	auto& ChildNodes = NodeFor->GetChildNodes();
 	for (const UMapNode* DestinationNode : ChildNodes)

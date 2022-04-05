@@ -20,13 +20,25 @@ UQuest::UQuest()
 
 void UQuest::SetCurrentNode(UQuestNode* Node)
 {
+	if (!Node)
+		return;
+	
 	CurrentNode = Node;
+	//CurrentNode->ExecutePreEvents();
+	
+	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	CurrentNode->ExecutePreEvents();
 }
 
 TArray<FString> UQuest::GetCurrentGoals() const
 {
 	return CurrentNode->GetNodeGoals();
+}
+
+void UQuest::ReconstructQuest()
+{
+	LastNodeIndex = -1;
+	Init();
 }
 
 void UQuest::TakeQuest()
@@ -50,22 +62,17 @@ void UQuest::ChangeNode(UQuestTransition* ExecutedTransition)
 {
 	if (QuestStatus != EQuestStatus::Taken)
 		return;
-	
-	if (CurrentNode->ContainsTransition(ExecutedTransition))
+
+	if (CurrentNode->IsLast())
+	{
+		FinishQuest();
+	}
+	else if (CurrentNode->ContainsTransition(ExecutedTransition))
 	{
 		ExecutedTransition->ExecutePostEvents();
 		CurrentNode->NodeCompleted.Unbind();
 		//CurrentNode = ExecutedTransition->GetTargetNode();
 		SetCurrentNode(ExecutedTransition->GetTargetNode());
-		if (CurrentNode->IsLast())
-		{
-			FinishQuest();
-		}
-		else
-		{
-			CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
-			CurrentNode->ExecutePreEvents();
-		}
 	}
 }
 

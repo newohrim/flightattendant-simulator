@@ -4,6 +4,7 @@
 #include "Characters/Workers/RepairWorker.h"
 
 #include "FAGameMode.h"
+#include "Components/GameEconomyComponent.h"
 #include "SpacePlane/SpacePlaneComponent.h"
 #include "SpacePlane/SpacePlaneHealthComponent.h"
 
@@ -25,13 +26,17 @@ FText ARepairWorker::GetParticipantCustomText_Implementation(FName ValueName) co
 	return Super::GetParticipantCustomText_Implementation(ValueName);
 }
 
-void ARepairWorker::RepairSpacePlane(int32 RepairCost, float RepairTime)
+void ARepairWorker::RepairSpacePlane(const int32 RepairCost, const float RepairTime)
 {
-	// TODO: Player pays for repairment here.
-
 	UWorld* World = GetWorld();
 	if (World)
 	{
+		// Withdraw player's money
+		UGameEconomyComponent* EconomyComponent =
+			Cast<AFAGameMode>(World->GetAuthGameMode())->GetEconomyComponent();
+		EconomyComponent->WithdrawPlayerMoney(RepairCost);
+
+		// Schedule ship repairment
 		USpacePlaneHealthComponent* HealthComponent =
 			Cast<AFAGameMode>(World->GetAuthGameMode())->GetSpacePlane()->GetSpacePlaneHealth();
 		FTimerDelegate AddHealthDel;

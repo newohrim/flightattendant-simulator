@@ -19,6 +19,7 @@
 #include "Components/CargoManagerComponent.h"
 #include "Components/PDAMessengerComponent.h"
 #include "Components/GameEconomyComponent.h"
+#include "SaveGame/SaveGameComponent.h"
 
 AFAGameMode::AFAGameMode()
 {
@@ -32,6 +33,8 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<USpacePlaneComponent>("SpacePlaneComponent");
 	EconomyComponent =
 		CreateDefaultSubobject<UGameEconomyComponent>("EconomyComponent");
+	SaveGameComponent =
+		CreateDefaultSubobject<USaveGameComponent>("SaveGameComponent");
 
 	const AFAGameMode* DefaultObject = Cast<AFAGameMode>(GetClass()->GetDefaultObject());
 	const TSubclassOf<UFlightControlComponent> DefaultClass = DefaultObject->DefaultFlightControllerClass;
@@ -53,39 +56,44 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
 	DebugCharactersSpawnLocations.Empty();
 
-	{ // TODO: Decompose to protected func
-		const UAssetManager& AssetManager = UAssetManager::Get();
-		const FPrimaryAssetType QuestAssetType = TEXT("Quest");
-		TArray<FPrimaryAssetId> QuestAssetsIds; 
-		AssetManager.GetPrimaryAssetIdList(QuestAssetType, QuestAssetsIds);
-		//const int32 QuestsToTake = FMath::RandRange(0, MaxNodeChildren);
-		for (int i = 0; i < QuestAssetsIds.Num(); ++i)
-		{
-			//const int32 RandIndex = FMath::RandHelper(QuestAssetsIds.Num());
-			//FPrimaryAssetId SampledAssetId = QuestAssetsIds[RandIndex];
-			FAssetData AssetData;
-			AssetManager.GetPrimaryAssetData(QuestAssetsIds[i], AssetData);
-			const auto Temp = Cast<UBlueprint>(AssetData.GetAsset());
-			UQuest* LoadedQuest = NewObject<UQuest>(this, Temp->GeneratedClass);
-			if (LoadedQuest)
+	WorldMap = NewObject<UMapGraph>(this);
+	
+	// Load game
+	if (!SaveGameComponent->LoadGame())
+	{
+		{ // TODO: Decompose to protected func
+			const UAssetManager& AssetManager = UAssetManager::Get();
+			const FPrimaryAssetType QuestAssetType = TEXT("Quest");
+			TArray<FPrimaryAssetId> QuestAssetsIds; 
+			AssetManager.GetPrimaryAssetIdList(QuestAssetType, QuestAssetsIds);
+			//const int32 QuestsToTake = FMath::RandRange(0, MaxNodeChildren);
+			for (int i = 0; i < QuestAssetsIds.Num(); ++i)
 			{
-				AvailableQuests.Add(LoadedQuest);
-				//QuestAssetsIds.RemoveAtSwap(RandIndex);
+				//const int32 RandIndex = FMath::RandHelper(QuestAssetsIds.Num());
+				//FPrimaryAssetId SampledAssetId = QuestAssetsIds[RandIndex];
+				FAssetData AssetData;
+				AssetManager.GetPrimaryAssetData(QuestAssetsIds[i], AssetData);
+				const auto Temp = Cast<UBlueprint>(AssetData.GetAsset());
+				UQuest* LoadedQuest = NewObject<UQuest>(this, Temp->GeneratedClass);
+				if (LoadedQuest)
+				{
+					AvailableQuests.Add(LoadedQuest);
+					//QuestAssetsIds.RemoveAtSwap(RandIndex);
+				}
 			}
 		}
-	}
 	
-	TArray<UQuest*> QuestsToPlace = SampleQuestList(MaxNodeChildren);
+		TArray<UQuest*> QuestsToPlace = SampleQuestList(MaxNodeChildren);
 
-	WorldMap = NewObject<UMapGraph>(this);
-	if (WorldMap)
-	{
-		WorldMap->GenerateMap(WorldMapMaxDepth, QuestsToPlace);
+		if (WorldMap)
+		{
+			WorldMap->GenerateMap(WorldMapMaxDepth, QuestsToPlace);
+		}
+		UpdatePlacedQuests(WorldMap->GetRootNode(), QuestsToPlace);
+
+		// Not sure where to call
+		LocationLoadedHandle();
 	}
-	UpdatePlacedQuests(WorldMap->GetRootNode(), QuestsToPlace);
-
-	// Not sure where to call
-	LocationLoadedHandle();
 }
 
 void AFAGameMode::BeginPlay()
@@ -101,8 +109,22 @@ void AFAGameMode::BeginPlay()
 		SpacePlane->SetUp(PassengerSeats);
 	}
 
-	FillPassengers();
-	CargoDeliveryManager->GenerateCargoes(WorldMap->GetCurrentNode());
+	//FillPassengers();
+	//CargoDeliveryManager->GenerateCargoes(WorldMap->GetCurrentNode());
+
+	PostLoadInitialization();
+}
+
+void AFAGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	SaveGameComponent->SaveGame();
+}
+
+void AFAGameMode::PostLoadInitialization()
+{
+	ChangeLocation(WorldMap->GetCurrentNode());
 }
 
 void AFAGameMode::LocationLoadedHandle()
@@ -111,12 +133,12 @@ void AFAGameMode::LocationLoadedHandle()
 	// Updating all quests structure.
 	for (UQuest* PlacedQuest : PlacedQuests)
 	{
-		PlacedQuest->Init();
+		PlacedQuest->ReconstructQuest();
 	}
 	// Available quests as well, cause may need to. Not sure.
 	for (UQuest* AvailableQuest : AvailableQuests)
 	{
-		AvailableQuest->Init();
+		AvailableQuest->ReconstructQuest();
 	}
 }
 
@@ -146,6 +168,16 @@ void AFAGameMode::RemoveFinishedQuest(UQuest* FinishedQuest)
 	TakenQuestsChanged.Broadcast();
 }
 
+void AFAGameMode::InitQuestsFromSaveFile(
+	const TArray<UQuest*>& TakenQuestsLoaded,
+	const TArray<UQuest*>& PlacedQuestsLoaded,
+	const TArray<UQuest*>& FinishedQuestsLoaded)
+{
+	TakenQuests = TakenQuestsLoaded;
+	PlacedQuests = PlacedQuestsLoaded;
+	FinishedQuests = FinishedQuestsLoaded;
+}
+
 void AFAGameMode::ExpandMapNode(UMapNode* NodeToExpand)
 {
 	// Removing all inaccessible quests, which Player can't reach
@@ -170,38 +202,9 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 		UE_LOG(LogTemp, Error, TEXT("NodeTravelTo was null."));
 		return;
 	}
-	
-	// EMPTY LOCATION
-	{
-		for (AFABaseCharacter* SpawnedCharacter : SpawnedCharacters)
-		{
-			SpawnedCharacter->Destroy();
-		}
-		SpawnedCharacters.Empty();
-		PassengersManager->ClearPassengers();
-	}
 
-	// SPAWN NEW CHARACTERS
-	{
-		UWorld* World = GetWorld();
-		if (!World)
-			return;
-		const auto& CharactersToSpawn =
-			NodeTravelTo->GetLocationInfo()->ResidentsCharacters;
-		for (int i = 0; i < CharactersToSpawn.Num(); ++i)
-		{
-			AActor* SpawnedCharacter =
-				World->SpawnActor(
-					CharactersToSpawn[i].Get(),
-					&DebugCharactersSpawnLocations[i]->GetActorTransform());
-			if (SpawnedCharacter)
-				SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
-		}
-		FillPassengers();
-	}
-
-	// GENERATE CARGO
-	CargoDeliveryManager->GenerateCargoes(NodeTravelTo);
+	// CHANGE LOCATION
+	ChangeLocation(NodeTravelTo);
 	
 	UE_LOG(LogTemp, Display,
 		TEXT("Player succesfully traveled to %s node."),
@@ -212,14 +215,24 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 	WorldMap->SetCurrentNode(NodeTravelTo);
 }
 
+void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation)
+{
+	// EMPTY LOCATION
+	EmptyLocation();
+	
+	// SPAWN NEW CHARACTERS
+	SpawnNewCharacters(TargetLocation);
+
+	// GENERATE CARGO
+	CargoDeliveryManager->GenerateCargoes(TargetLocation);
+}
+
 void AFAGameMode::LetPassengerInPlane(AFABasePassenger* PassengerToLetIn)
 {
 	if (SpacePlane->AssignPassenger(PassengerToLetIn))
 	{
 		const FVector MoveToSeatLocation =
 			PassengerToLetIn->GetAssignedPassengerSeat()->GetMoveToLocation().GetLocation();
-		//PassengerToLetIn->TargetReached.AddDynamic(PassengerToLetIn, &AFABasePassenger::SitOnSeat);
-		//PassengerToLetIn->MoveTo(MoveToSeatLocation);
 		UActionExecutorComponent* ActionExecutor = PassengerToLetIn->GetActionExecutorComponent();
 		ActionExecutor->SetActions(
 		{
@@ -306,8 +319,9 @@ void AFAGameMode::UpdatePlacedQuests(const UMapNode* ExpandedNode, TArray<UQuest
 
 void AFAGameMode::RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreFrom)
 {
+	TArray<UQuest*> InaccessibleQuests;
 	const UMapNode* CommonParent = NodeOfParentToIgnoreFrom->GetParentNode();
-	for (int i = PlacedQuests.Num() - 1; i >= 0; --i)
+	for (int32 i = PlacedQuests.Num() - 1; i >= 0; --i)
 	{
 		if (PlacedQuests[i]->GetLocationsToGenerate().Num() == 0)
 		{
@@ -321,10 +335,14 @@ void AFAGameMode::RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreF
 		if (PlacedNodeParent != CommonParent
 			&& !PlacedQuests[i]->GetIsFamiliar())
 		{
-			PlacedQuests[i]->SetIsPlaced(false);
-			AvailableQuests.Add(PlacedQuests[i]);
-			PlacedQuests.RemoveAtSwap(i);
+			InaccessibleQuests.Add(PlacedQuests[i]);
 		}
+	}
+	for (UQuest* Quest : InaccessibleQuests)
+	{
+		Quest->SetIsPlaced(false);
+		AvailableQuests.Add(Quest);
+		PlacedQuests.RemoveSwap(Quest);
 	}
 }
 
@@ -350,4 +368,34 @@ void AFAGameMode::FillPassengers()
 			Destination)
 				->SpawnDefaultController();
 	}
+}
+
+void AFAGameMode::EmptyLocation()
+{
+	for (AFABaseCharacter* SpawnedCharacter : SpawnedCharacters)
+	{
+		SpawnedCharacter->Destroy();
+	}
+	SpawnedCharacters.Empty();
+	PassengersManager->ClearRedundantPassengers();
+}
+
+void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+	const auto& CharactersToSpawn =
+		NodeTravelTo->GetLocationInfo()->ResidentsCharacters;
+	const int32 Num = FMath::Min(CharactersToSpawn.Num(), DebugCharactersSpawnLocations.Num());
+	for (int32 i = 0; i < Num; ++i)
+	{
+		AActor* SpawnedCharacter =
+			World->SpawnActor(
+				CharactersToSpawn[i].Get(),
+				&DebugCharactersSpawnLocations[i]->GetActorTransform());
+		if (SpawnedCharacter)
+			SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
+	}
+	FillPassengers();
 }

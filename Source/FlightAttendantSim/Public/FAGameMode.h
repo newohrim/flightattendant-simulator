@@ -18,6 +18,7 @@ class UCargoManagerComponent;
 class UPDAMessengerComponent;
 class UFlightControlComponent;
 class UGameEconomyComponent;
+class USaveGameComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 
@@ -37,9 +38,19 @@ public:
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void BeginPlay() override;
+	virtual void Logout(AController* Exiting) override;
+	virtual void PostLoadInitialization();
 	void LocationLoadedHandle();
 	
 	void TakeQuest(TSubclassOf<UQuest> TakenQuest);
+
+	const TArray<UQuest*>& GetTakenQuests() const { return TakenQuests; }
+	const TArray<UQuest*>& GetPlacedQuests() const { return PlacedQuests; }
+	const TArray<UQuest*>& GetFinishedQuests() const { return FinishedQuests; }
+	void InitQuestsFromSaveFile(
+		const TArray<UQuest*>& TakenQuestsLoaded,
+		const TArray<UQuest*>& PlacedQuestsLoaded,
+		const TArray<UQuest*>& FinishedQuestsLoaded);
 
 	UFUNCTION(BlueprintCallable)
 	void ExpandMapNode(UMapNode* NodeToExpand);
@@ -65,6 +76,10 @@ public:
 	UFlightControlComponent* GetFlightController() const { return FlightController; }
 
 	UGameEconomyComponent* GetEconomyComponent() const { return EconomyComponent; }
+
+	USaveGameComponent* GetSaveGameComponent() const { return SaveGameComponent; }
+
+	UMapGraph* GetWorldMap() const { return WorldMap; }
 
 	USpacePlaneComponent* GetSpacePlane() const { return SpacePlane; }
 
@@ -102,6 +117,8 @@ protected:
 	UFlightControlComponent* FlightController;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UGameEconomyComponent* EconomyComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USaveGameComponent* SaveGameComponent;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
@@ -127,6 +144,12 @@ protected:
 	void UpdatePlacedQuests(const UMapNode* ExpandedNode, TArray<UQuest*>& QuestsToPlace);
 	void RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreFrom);
 	void FillPassengers();
+
+	void EmptyLocation();
+
+	void SpawnNewCharacters(const UMapNode* NodeTravelTo);
+
+	void ChangeLocation(const UMapNode* TargetLocation);
 
 private:
 	UPROPERTY()

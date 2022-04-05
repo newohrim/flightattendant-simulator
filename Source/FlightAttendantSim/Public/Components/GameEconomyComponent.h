@@ -25,6 +25,8 @@ public:
 	
 	int64 GetPlayerMoney() const { return PlayerMoney; }
 
+	void SetPlayerMoney(int64 Value) { if (Value >= 0) PlayerMoney = Value; }
+
 	UFUNCTION(BlueprintCallable)
 	void AddPlayerMoney(const int64 Value);
 
@@ -41,5 +43,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int64 PlayerMoney = 0;
 
-	FTimerHandle EconomyTimerHandle;;
+	FTimerHandle EconomyTimerHandle;
 };

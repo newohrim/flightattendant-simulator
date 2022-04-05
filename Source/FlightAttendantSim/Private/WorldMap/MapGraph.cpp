@@ -8,6 +8,13 @@
 #include "WorldMap/TreeLayoutDrawing/TreeLayeredLayoutDrawer.h"
 #include "WorldMap/MapNode.h"
 
+UMapGraph::UMapGraph()
+{
+	// Manual cleanup is in BeginDestroy()
+	// Is this even allowed?
+	TreeDrawer = new FTreeLayeredLayoutDrawer();
+}
+
 void UMapGraph::BeginDestroy()
 {
 	UObject::BeginDestroy();
@@ -17,13 +24,11 @@ void UMapGraph::BeginDestroy()
 
 void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 {
-	// Manual cleanup is in BeginDestroy()
-	TreeDrawer = new FTreeLayeredLayoutDrawer();
-	
 	this->MaxDepth = Depth;
 
 	RootNode = NewObject<UMapNode>(this);
 	RootNode->SetHeightLevel(0);
+	MapGraphChanged.AddUniqueDynamic(this, &UMapGraph::MapGraphChangedHandle);
 	ULocationInfo* RootLocation = NewObject<ULocationInfo>(this);
 	RootLocation->CorrespondingNode = RootNode;
 	RootLocation->LocationName = FText::FromString("RootStation");
@@ -31,6 +36,14 @@ void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 	ExpandNode(RootNode, QuestsToPlace);
 	//RootNode->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum);
 	CurrentNode = RootNode;
+}
+
+void UMapGraph::GenerateMap(UMapNode* NewRootNode)
+{
+	RootNode = NewRootNode;
+	RootNode->SetHeightLevel(0);
+	MapGraphChanged.AddUniqueDynamic(this, &UMapGraph::MapGraphChangedHandle);
+	MapGraphChanged.Broadcast();
 }
 
 int32 UMapGraph::GetCurrentDepth() const
@@ -56,6 +69,11 @@ void UMapGraph::ExpandNode(UMapNode* Node, const TArray<UQuest*>& QuestsToPlace)
 	//CurrentMaxHeight = X / 2;
 	//CurrentMaxDepth = GetGraphDepth();
 	//RootNode->UpdateHeightLevels(-CurrentMaxHeight - (RootNode->GetHeightLevel() - CurrentMaxHeight));
+	MapGraphChanged.Broadcast();
+}
+
+void UMapGraph::MapGraphChangedHandle()
+{
 	if (TreeDrawer)
 	{
 		TreeDrawer->MakeGridLayout(RootNode);

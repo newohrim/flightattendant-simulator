@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "WorldMap/BitmapHeight.h"
 #include "MapGraph.generated.h"
 
 class UMapNode;
 class UQuest;
 class ITreeLayoutDrawer;
 
-typedef TIndexedContainerIterator<TArray<UQuest*>, UQuest*, TArray<UQuest*>::SizeType> TQuestIterator;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMapGraphChanged);
 
 /**
  * 
@@ -22,9 +21,15 @@ class FLIGHTATTENDANTSIM_API UMapGraph : public UObject
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FMapGraphChanged MapGraphChanged;
+	
+	UMapGraph();
+	
 	virtual void BeginDestroy() override;
 	
 	void GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace);
+	void GenerateMap(UMapNode* NewRootNode);
 	int32 GetCurrentDepth() const;
 	int32 GetGraphDepth() const;
 
@@ -54,6 +59,9 @@ protected:
 	UMapNode* CurrentNode;
 
 	ITreeLayoutDrawer* TreeDrawer = nullptr;
+
+	UFUNCTION()
+	virtual void MapGraphChangedHandle();
 
 private:
 	int32 CurrentMaxDepth = 0;

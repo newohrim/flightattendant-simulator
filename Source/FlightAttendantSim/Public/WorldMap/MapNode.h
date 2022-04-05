@@ -53,6 +53,7 @@ public:
 	void GetConnectedPairs(TArray<FVector2D>& NodePairs) const;
 	
 	void GenerateChildrenNodes(const TArray<UQuest*>& QuestsToPlace, const int32 NewDepth);
+	//UMapNode* AddChildNode() { ChildNodes.Add(); }
 	UFUNCTION(BlueprintCallable)
 	const TArray<UMapNode*>& GetChildNodes() const { return ChildNodes; }
 

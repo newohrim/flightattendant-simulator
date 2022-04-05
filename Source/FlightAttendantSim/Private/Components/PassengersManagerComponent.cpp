@@ -41,7 +41,7 @@ AFABasePassenger* UPassengersManagerComponent::CreatePassenger(const FTransform&
 	return nullptr;
 }
 
-void UPassengersManagerComponent::ClearPassengers()
+void UPassengersManagerComponent::ClearRedundantPassengers()
 {
 	TArray<int32> DestroyedActors;
 	for (int32 i = 0; i < SpawnedPassengers.Num(); ++i)

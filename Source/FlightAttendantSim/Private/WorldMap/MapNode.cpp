@@ -67,7 +67,7 @@ void UMapNode::GetConnectedPairs(TArray<FVector2D>& NodePairs) const
 
 void UMapNode::GenerateChildrenNodes(const TArray<UQuest*>& QuestsToPlace, const int32 NewDepth)
 {
-	int32 ChildrenCount = 0;
+	int32 QuestsPerLoc = FMath::RandRange(1, 2);
 	for (UQuest* Quest : QuestsToPlace)
 	{
 		auto& Locations = Quest->GetLocationsToGenerate();
@@ -78,21 +78,32 @@ void UMapNode::GenerateChildrenNodes(const TArray<UQuest*>& QuestsToPlace, const
         		*(Quest->GetQuestName()));
         	return;
         }
-		
+
         UMapNode* CurrentChild = this;
-		for (int j = 0; j < Locations.Num(); ++j)
+		for (int32 j = 0; j < Locations.Num(); ++j)
 		{
 			// Forming a straight line of quest narration
 			// (not as flexible as I'd like, but ok)
 			// TODO: Make special array of spaces between locations. This way it will be more flexible.
-			CurrentChild->ChildNodes.Add(GenerateNode(Locations[j]));
-			CurrentChild = ChildNodes.Last();
-			CurrentChild->SetDepth(NewDepth);
-			CurrentChild->SetParentNode(this);
+			if (CurrentChild == this && QuestsPerLoc > 0 && ChildNodes.Num() > 0)
+			{
+				CurrentChild = ChildNodes.Last();
+				CurrentChild->LocationInfo->Merge(Locations[j]);
+			}
+			else
+			{
+				CurrentChild->ChildNodes.Add(GenerateNode(Locations[j]));
+				CurrentChild->ChildNodes.Last()->SetParentNode(CurrentChild);
+				CurrentChild = ChildNodes.Last();
+				CurrentChild->SetDepth(NewDepth + j);
+			}
 		}
+		// Unreadable code X_X
+		// One step delay
+		if (QuestsPerLoc-- <= 0)
+			QuestsPerLoc += FMath::RandRange(1, 2);
 		Quest->SetIsPlaced(true);
-		++ChildrenCount;
-		if (ChildrenCount >= MaxChildrenCount)
+		if (ChildNodes.Num() >= MaxChildrenCount)
 			break;
 	}
 }
