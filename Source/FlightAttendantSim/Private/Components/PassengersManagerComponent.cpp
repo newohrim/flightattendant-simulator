@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "WorldMap/LocationInfo.h"
 
-
 // Sets default values for this component's properties
 UPassengersManagerComponent::UPassengersManagerComponent()
 {
@@ -21,24 +20,25 @@ UPassengersManagerComponent::UPassengersManagerComponent()
 
 AFABasePassenger* UPassengersManagerComponent::CreatePassenger(const FTransform& PassengerTransform, ULocationInfo* Destination)
 {
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		AFABasePassenger* Passenger = World->SpawnActorDeferred<AFABasePassenger>(
-			PassengerToSpawn,
-			PassengerTransform
-		);
-		if (Passenger)
-		{
-			Passenger->SetDocsInfo(CreateDocument());
-			Passenger->SetDestinationLocation(Destination);
-			UGameplayStatics::FinishSpawningActor(Passenger, Passenger->GetActorTransform());
-			SpawnedPassengers.Add(Passenger);
-		}
-		return Passenger;
-	}
+	return SpawnPassenger({
+		PassengerTransform,
+		Destination,
+		CreateDocument()
+	});
+}
 
-	return nullptr;
+AFABasePassenger* UPassengersManagerComponent::PopBufferedPassenger()
+{
+	if (BufferedPassengers.Num() > 0)
+	{
+		const FPassengerSpawnParams SpawnParams = BufferedPassengers.Pop(false);
+		return SpawnPassenger(SpawnParams);
+	}
+	else
+	{
+		BufferedPassengers.Shrink();
+		return nullptr;
+	}
 }
 
 void UPassengersManagerComponent::ClearRedundantPassengers()
@@ -68,6 +68,28 @@ void UPassengersManagerComponent::BeginPlay()
 
 	LastNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToLastNames));
 	FirstNames = UDocsInfoStruct::LoadUsingFileHelperStrings(TCHAR_TO_UTF8(*PathToFirstNames));
+}
+
+AFABasePassenger* UPassengersManagerComponent::SpawnPassenger(const FPassengerSpawnParams& SpawnParams)
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		AFABasePassenger* Passenger = World->SpawnActorDeferred<AFABasePassenger>(
+			PassengerToSpawn,
+			SpawnParams.PassengerTransform
+		);
+		if (Passenger)
+		{
+			Passenger->SetDocsInfo(SpawnParams.DocumentsInfo);
+			Passenger->SetDestinationLocation(SpawnParams.LocationHeadingTo.Get());
+			UGameplayStatics::FinishSpawningActor(Passenger, Passenger->GetActorTransform());
+			SpawnedPassengers.Add(Passenger);
+		}
+		return Passenger;
+	}
+
+	return nullptr;
 }
 
 FDocsInfo UPassengersManagerComponent::CreateDocument() const

@@ -13,8 +13,6 @@ class UMapNode;
 USTRUCT(BlueprintType)
 struct FCargoInfo
 {
-	
-
 	GENERATED_BODY()
 
 public:
@@ -24,10 +22,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TSoftObjectPtr<UMapNode> LocationTo;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 CargoWeight;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, SaveGame)
 	FString CompanyName;
 
 	int32 GetDeliveryCost() const { return FMath::Floor(CargoWeight * CostWeightMultiplier); }

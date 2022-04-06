@@ -8,6 +8,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "FAGameMode.generated.h"
 
+#define FAGAMEMODE Cast<AFAGameMode>(GetWorld()->GetAuthGameMode())
+
 class AFABaseCharacter;
 class AFABasePassenger;
 class UMapNode;
@@ -144,16 +146,20 @@ protected:
 	void UpdatePlacedQuests(const UMapNode* ExpandedNode, TArray<UQuest*>& QuestsToPlace);
 	void RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreFrom);
 	void FillPassengers();
+	
+	void FillPassengersPostLoad() const;
 
 	void EmptyLocation();
 
-	void SpawnNewCharacters(const UMapNode* NodeTravelTo);
+	void SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitial);
 
-	void ChangeLocation(const UMapNode* TargetLocation);
+	void ChangeLocation(const UMapNode* TargetLocation, const bool IsInitial = false);
 
 private:
 	UPROPERTY()
 	TArray<AFABaseCharacter*> SpawnedCharacters;
+
+	bool LoadSucceeded = true;
 
 	void AddTakenQuest(UQuest* TakenQuest);
 	void RemoveFinishedQuest(UQuest* FinishedQuest);

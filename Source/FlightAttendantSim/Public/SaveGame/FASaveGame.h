@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/Passengers/PassengerSpawnParams.h"
+#include "CargoDelivery/CargoInfo.h"
 #include "GameFramework/SaveGame.h"
 #include "FASaveGame.generated.h"
 
@@ -10,6 +12,8 @@ class ULocationInfo;
 class UMapGraph;
 class UMapNode;
 class UQuest;
+class USpacePlaneComponent;
+class UPassengersManagerComponent;
 
 USTRUCT()
 struct FMapNodeData
@@ -40,6 +44,53 @@ struct FQuestData
 	int32 CurrentNodeIndex = -1;
 };
 
+USTRUCT()
+struct FCargoData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FCargoInfo CargoInfo;
+
+	UPROPERTY()
+	int32 LocationFromIndex = -1;
+
+	UPROPERTY()
+	int32 LocationToIndex = -1;
+};
+
+USTRUCT()
+struct FPassengerData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FPassengerSpawnParams SpawnParams;
+
+	UPROPERTY()
+	int32 LocationHeadingToIndex = -1;
+};
+
+USTRUCT()
+struct FSpacePlaneData
+{
+	GENERATED_BODY()
+
+	TSoftObjectPtr<USpacePlaneComponent> SpacePlane = nullptr;
+
+	UPROPERTY()
+	TArray<uint8> SpacePlaneData;
+
+	UPROPERTY()
+	TArray<uint8> HealthComponentData;
+
+	UPROPERTY()
+	TArray<uint8> CargoCellData;
+
+	UPROPERTY()
+	TArray<FPassengerData> AssignedPassengers;
+};
+
 /**
  * 
  */
@@ -67,6 +118,15 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Quests)
 	TArray<FQuestData> FinishedQuests;
 
+	UPROPERTY(VisibleAnywhere, Category = Cargoes)
+	TArray<FCargoData> TakenCargoes;
+
+	UPROPERTY(VisibleAnywhere, Category = Cargoes)
+	TArray<FCargoData> AvailableCargoes;
+
+	UPROPERTY(VisibleAnywhere, Category = SpacePlane)
+	FSpacePlaneData SpacePlaneData;
+
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	FString SaveSlotName;
 
@@ -78,6 +138,12 @@ public:
 	void PostLoadInitialization();
 	
 	void SaveWorldMap(const UMapGraph* MapGraph);
+
+	void SaveSpacePlane(USpacePlaneComponent* SpacePlaneComponent);
+
+	void SavePassengers(const UPassengersManagerComponent* PassengersManager);
+
+	int32 FindNode(const UMapNode* Node) const;
 
 	FMapNodeData GetRootNode() const
 	{

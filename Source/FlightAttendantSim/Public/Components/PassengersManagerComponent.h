@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/Passengers/PassengerSpawnParams.h"
+#include "Characters/Passengers/DocsInfo.h"
 #include "Components/ActorComponent.h"
 #include "PassengersManagerComponent.generated.h"
 
 class AFABasePassenger;
 class ULocationInfo;
-struct FDocsInfo;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIGHTATTENDANTSIM_API UPassengersManagerComponent : public UActorComponent
@@ -21,6 +22,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	AFABasePassenger* CreatePassenger(const FTransform& PassengerTransform, ULocationInfo* Destination);
+
+	AFABasePassenger* PopBufferedPassenger();
+
+	void BufferPassengers(const TArray<FPassengerSpawnParams>& SpawnParams) { BufferedPassengers = SpawnParams; }
+
+	const TArray<AFABasePassenger*>& GetSpawnedPassengers() const { return SpawnedPassengers; }
 
 	FDocsInfo CreateDocument() const;
 	
@@ -40,9 +47,13 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<AFABasePassenger*> SpawnedPassengers;
+
+	TArray<FPassengerSpawnParams> BufferedPassengers;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	AFABasePassenger* SpawnPassenger(const FPassengerSpawnParams& SpawnParams);
 
 private:
 	TArray<FString> LastNames;

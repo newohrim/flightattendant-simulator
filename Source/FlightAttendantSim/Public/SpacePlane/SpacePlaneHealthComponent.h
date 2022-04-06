@@ -40,9 +40,9 @@ public:
 	void AddDamage(float Damage); 
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, SaveGame)
 	float Health = 100.0f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, SaveGame)
 	float MaxHealth = 100.0f;
 	
 	// Called when the game starts

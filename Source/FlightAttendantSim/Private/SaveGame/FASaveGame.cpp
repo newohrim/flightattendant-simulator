@@ -4,10 +4,15 @@
 #include "FASaveGame.h"
 
 #include "FASaveGameArchive.h"
+#include "PassengersManagerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "WorldMap/MapGraph.h"
 #include "WorldMap/MapNode.h"
 #include "WorldMap/LocationInfo.h"
+#include "SpacePlane/SpacePlaneComponent.h"
+#include "SpacePlane/SpacePlaneHealthComponent.h"
+#include "SpacePlane/CargoCellComponent.h"
+#include "Characters/FABasePassenger.h"
 
 UFASaveGame::UFASaveGame()
 {
@@ -18,12 +23,57 @@ UFASaveGame::UFASaveGame()
 void UFASaveGame::PostLoadInitialization()
 {
 	MapGraphTraversalRead();
+	USpacePlaneComponent* SpacePlaneComponent = SpacePlaneData.SpacePlane.Get();
+	DeserializeObject(SpacePlaneComponent, SpacePlaneData.SpacePlaneData);
+	DeserializeObject(SpacePlaneComponent->GetSpacePlaneHealth(), SpacePlaneData.HealthComponentData);
+	DeserializeObject(SpacePlaneComponent->GetCargoCell(), SpacePlaneData.CargoCellData);
 }
 
 void UFASaveGame::SaveWorldMap(const UMapGraph* MapGraph)
 {
 	WorldMap.Empty();
 	WorldMap.Add(MapGraphTraversalWrite(MapGraph->GetRootNode(), MapGraph->GetCurrentNode()));
+}
+
+void UFASaveGame::SaveSpacePlane(USpacePlaneComponent* SpacePlaneComponent)
+{
+	SpacePlaneData.SpacePlane = SpacePlaneComponent;
+	SerializeObject(SpacePlaneComponent, SpacePlaneData.SpacePlaneData);
+	SerializeObject(SpacePlaneComponent->GetSpacePlaneHealth(), SpacePlaneData.HealthComponentData);
+	SerializeObject(SpacePlaneComponent->GetCargoCell(), SpacePlaneData.CargoCellData);
+}
+
+void UFASaveGame::SavePassengers(const UPassengersManagerComponent* PassengersManager)
+{
+	// Save passengers info
+	SpacePlaneData.AssignedPassengers.Empty();
+	auto& Passengers = PassengersManager->GetSpawnedPassengers();
+	for (const AFABasePassenger* Passenger : Passengers)
+	{
+		SpacePlaneData.AssignedPassengers.Add(
+			{
+				{
+					Passenger->GetActorTransform(),
+					Passenger->GetLocationHeadingTo(),
+					Passenger->GetDocsInfo(),
+					Passenger->IsAssigned()
+				},
+				FindNode(Passenger->GetLocationHeadingTo()->CorrespondingNode)
+			});
+	}
+}
+
+int32 UFASaveGame::FindNode(const UMapNode* Node) const
+{
+	for (int32 i = 0; i < WorldMap.Num(); ++i)
+	{
+		if (WorldMap[i].LocationInfo->CorrespondingNode == Node)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 FMapNodeData UFASaveGame::MapGraphTraversalWrite(const UMapNode* Node, const UMapNode* CurrentNode)

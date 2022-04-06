@@ -61,6 +61,8 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 	// Load game
 	if (!SaveGameComponent->LoadGame())
 	{
+		LoadSucceeded = false;
+		
 		{ // TODO: Decompose to protected func
 			const UAssetManager& AssetManager = UAssetManager::Get();
 			const FPrimaryAssetType QuestAssetType = TEXT("Quest");
@@ -124,7 +126,7 @@ void AFAGameMode::Logout(AController* Exiting)
 
 void AFAGameMode::PostLoadInitialization()
 {
-	ChangeLocation(WorldMap->GetCurrentNode());
+	ChangeLocation(WorldMap->GetCurrentNode(), true);
 }
 
 void AFAGameMode::LocationLoadedHandle()
@@ -135,7 +137,7 @@ void AFAGameMode::LocationLoadedHandle()
 	{
 		PlacedQuest->ReconstructQuest();
 	}
-	// Available quests as well, cause may need to. Not sure.
+	// Available quests as well, cause may need too. Not sure.
 	for (UQuest* AvailableQuest : AvailableQuests)
 	{
 		AvailableQuest->ReconstructQuest();
@@ -204,7 +206,7 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 	}
 
 	// CHANGE LOCATION
-	ChangeLocation(NodeTravelTo);
+	ChangeLocation(NodeTravelTo, false);
 	
 	UE_LOG(LogTemp, Display,
 		TEXT("Player succesfully traveled to %s node."),
@@ -215,13 +217,13 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 	WorldMap->SetCurrentNode(NodeTravelTo);
 }
 
-void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation)
+void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation, const bool IsInitial)
 {
 	// EMPTY LOCATION
 	EmptyLocation();
 	
 	// SPAWN NEW CHARACTERS
-	SpawnNewCharacters(TargetLocation);
+	SpawnNewCharacters(TargetLocation, IsInitial);
 
 	// GENERATE CARGO
 	CargoDeliveryManager->GenerateCargoes(TargetLocation);
@@ -370,6 +372,12 @@ void AFAGameMode::FillPassengers()
 	}
 }
 
+void AFAGameMode::FillPassengersPostLoad() const
+{
+	// Spawn buffered from save file passengers
+	while (PassengersManager->PopBufferedPassenger());
+}
+
 void AFAGameMode::EmptyLocation()
 {
 	for (AFABaseCharacter* SpawnedCharacter : SpawnedCharacters)
@@ -380,7 +388,7 @@ void AFAGameMode::EmptyLocation()
 	PassengersManager->ClearRedundantPassengers();
 }
 
-void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo)
+void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitial)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -397,5 +405,8 @@ void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo)
 		if (SpawnedCharacter)
 			SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
 	}
-	FillPassengers();
+	if (!LoadSucceeded || !IsInitial)
+		FillPassengers();
+	else if (IsInitial)
+		FillPassengersPostLoad();
 }

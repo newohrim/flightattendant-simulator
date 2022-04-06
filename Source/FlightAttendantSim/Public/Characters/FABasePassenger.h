@@ -26,8 +26,12 @@ public:
 	void AssignPassengerSeat(APassengerSeat* PassengerSeat);
 	void DeassignPassengerSeat();
 	APassengerSeat* GetAssignedPassengerSeat() const { return AssignedPassengerSeat; }
-	void SetDocsInfo(const FDocsInfo DocsInfo) { DocumentsInfo = DocsInfo; }
+	const FDocsInfo& GetDocsInfo() const { return DocumentsInfo; }
+	void SetDocsInfo(const FDocsInfo& DocsInfo) { DocumentsInfo = DocsInfo; }
+	ULocationInfo* GetLocationHeadingTo() const { return LocationHeadingTo; }
 	void SetDestinationLocation(ULocationInfo* Destination) { LocationHeadingTo = Destination; }
+
+	bool IsAssigned() const { return AssignedPassengerSeat != nullptr; }
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced)

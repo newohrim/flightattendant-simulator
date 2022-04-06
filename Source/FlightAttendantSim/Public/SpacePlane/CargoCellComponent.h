@@ -17,6 +17,8 @@ class FLIGHTATTENDANTSIM_API UCargoCellComponent : public UActorComponent
 
 public:
 	UCargoCellComponent();
+
+	const TArray<FCargoInfo>& GetTakenCargoes() const { return TakenCargoes; }
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetCargoLoad(const int32 PassengersCount) const;
@@ -32,7 +34,7 @@ public:
 protected:
 	constexpr static int32 PassengersCargoWeight = 10;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 Capacity = 100;
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FCargoInfo> TakenCargoes;

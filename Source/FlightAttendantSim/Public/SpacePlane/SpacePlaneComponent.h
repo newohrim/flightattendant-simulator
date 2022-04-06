@@ -31,6 +31,7 @@ public:
 	int32 GetSeatsNum() const { return PassengerSeats.Num(); }
 	UFUNCTION(BlueprintCallable)
 	int32 GetPassengersCount() const { return AssignedPassengers.Num(); }
+	const TArray<AFABasePassenger*>& GetAssignedPassengers() const { return AssignedPassengers; }
 
 	USpacePlaneHealthComponent* GetSpacePlaneHealth() const { return HealthComponent; }
 

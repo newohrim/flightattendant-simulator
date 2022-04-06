@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FASaveGame.h"
 #include "WorldMap/MapNode.h"
 #include "Components/ActorComponent.h"
 #include "SaveGameComponent.generated.h"
@@ -11,6 +12,8 @@ struct FMapNodeData;
 struct FQuestData;
 class UFASaveGame;
 class UMapNode;
+class UCargoManagerComponent;
+class UCargoCellComponent;
 enum EQuestStatus;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -39,10 +42,26 @@ protected:
 
 private:
 	static void PopulateQuests(TArray<FQuestData>& ToList, const TArray<UQuest*>& FromList);
+	
 	static TArray<UQuest*> GatherQuests(
 		const TArray<FQuestData>& FromList,
 		const EQuestStatus QuestStatus,
 		UObject* Outer);
+
+	static void PopulateCargoes(
+		TArray<FCargoData>& ToList,
+		const TArray<FCargoInfo>& FromList,
+		const UFASaveGame* SaveGame);
+
+	template<typename F>
+	static void GatherCargoes(
+		TArray<FCargoData>& FromList,
+		const UFASaveGame* SaveGame,
+		F&& AddToListFunc);
+
+	static TArray<FPassengerSpawnParams> GatherPassengers(
+		TArray<FPassengerData>& FromList,
+		const UFASaveGame* SaveGame);
 
 public:
 	UMapNode* ReconstructWorldMap(
