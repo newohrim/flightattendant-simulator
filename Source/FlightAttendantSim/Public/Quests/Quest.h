@@ -49,6 +49,10 @@ public:
 	{
 		UQuestNode* Node = NewObject<UQuestNode>(this);
 		Node->SetNodeIndex(Index);
+		if (!RootNode)
+		{
+			RootNode = Node;
+		}
 		if (Index == CurrentNodeIndex)
 		{
 			SetCurrentNode(Node);
@@ -81,7 +85,6 @@ public:
 	// TODO: Make protected?
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Init();
-	UFUNCTION(BlueprintCallable)
 	void TakeQuest();
 	void ChangeNode(UQuestTransition* ExecutedTransition);
 	void FinishQuest();
@@ -105,7 +108,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "QuestInfo")
 	TArray<ULocationInfo*> LocationsToGenerate;
 	UPROPERTY()
-	UQuestNode* CurrentNode;
+	UQuestNode* CurrentNode = nullptr;
+	UPROPERTY()
+	UQuestNode* RootNode = nullptr;
 	// Is quest placed e.g. used for World Map generation?
 	UPROPERTY(BlueprintReadOnly)
 	bool IsPlaced = false;

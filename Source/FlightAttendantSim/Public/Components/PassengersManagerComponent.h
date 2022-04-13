@@ -10,6 +10,7 @@
 
 class AFABasePassenger;
 class ULocationInfo;
+class UMapNode;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIGHTATTENDANTSIM_API UPassengersManagerComponent : public UActorComponent
@@ -29,7 +30,7 @@ public:
 
 	const TArray<AFABasePassenger*>& GetSpawnedPassengers() const { return SpawnedPassengers; }
 
-	FDocsInfo CreateDocument() const;
+	FDocsInfo CreateDocument();
 	
 	void ClearRedundantPassengers();
 
@@ -42,18 +43,48 @@ protected:
 	int32 MinPassengerId;
 	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
 	int32 MaxPassengerId;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	int32 MaxWantedCharactersNum = 2;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	float WantedCharacterSpawnRate = 0.2f;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	float WantedCharacterTransportationPenaltyRate = 0.25f;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	int32 WantedCharacterTransportationPenalty = 120;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	int32 WantedCharacterTransportationDelayMin = 10;
+	UPROPERTY(EditDefaultsOnly, Category = "DocsInfoConstraints")
+	int32 WantedCharacterTransportationDelayMax = 300;
 	UPROPERTY(EditDefaultsOnly, Category = "PassengersSpawn")
 	TSubclassOf<AFABasePassenger> PassengerToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Waypoints")
+	FString LeavePlaneWaypoint;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Passengers Economics")
+	int32 PassengerTicketPrice = 15;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Passengers Economics")
+	int32 PassengerServePrice = 5;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<AFABasePassenger*> SpawnedPassengers;
 
 	TArray<FPassengerSpawnParams> BufferedPassengers;
+
+	TArray<FDocsInfo> WantedCharacters;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	AFABasePassenger* SpawnPassenger(const FPassengerSpawnParams& SpawnParams);
+
+	UFUNCTION()
+	virtual void LocationLoadedHandle(const UMapNode* Destination);
+
+	UFUNCTION()
+	virtual void PlayerArrivedHandle(UMapNode* Destination);
+
+	void ExecutePenalties() const;
+
+	void PassengersLeavePlane(const UMapNode* Destination);
 
 private:
 	TArray<FString> LastNames;

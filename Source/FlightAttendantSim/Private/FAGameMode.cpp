@@ -3,7 +3,10 @@
 
 #include "FAGameMode.h"
 
-#include "FlightControlComponent.h"
+#include "EngineUtils.h"
+#include "FAGameInstance.h"
+#include "SpacePlane/SpacePlaneHealthComponent.h"
+#include "Flight/FlightControlComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Characters/Actions/CharacterSitAction.h"
 #include "Characters/Actions/CharacterMoveAction.h"
@@ -20,6 +23,7 @@
 #include "Components/PDAMessengerComponent.h"
 #include "Components/GameEconomyComponent.h"
 #include "SaveGame/SaveGameComponent.h"
+#include "Components/WaypointsComponent.h"
 
 AFAGameMode::AFAGameMode()
 {
@@ -35,6 +39,8 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<UGameEconomyComponent>("EconomyComponent");
 	SaveGameComponent =
 		CreateDefaultSubobject<USaveGameComponent>("SaveGameComponent");
+	WaypointsComponent =
+		CreateDefaultSubobject<UWaypointsComponent>("WaypointsComponent");
 
 	const AFAGameMode* DefaultObject = Cast<AFAGameMode>(GetClass()->GetDefaultObject());
 	const TSubclassOf<UFlightControlComponent> DefaultClass = DefaultObject->DefaultFlightControllerClass;
@@ -57,30 +63,50 @@ void AFAGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 	DebugCharactersSpawnLocations.Empty();
 
 	WorldMap = NewObject<UMapGraph>(this);
+
+	const UFAGameInstance* GameInstance = Cast<UFAGameInstance>(GetWorld()->GetGameInstance());
 	
 	// Load game
-	if (!SaveGameComponent->LoadGame())
+	if (GameInstance->IsNewGame || !SaveGameComponent->LoadGame())
 	{
 		LoadSucceeded = false;
 		
 		{ // TODO: Decompose to protected func
 			const UAssetManager& AssetManager = UAssetManager::Get();
+			
 			const FPrimaryAssetType QuestAssetType = TEXT("Quest");
-			TArray<FPrimaryAssetId> QuestAssetsIds; 
+			TArray<FPrimaryAssetId> QuestAssetsIds;
+			FStreamableManager AssetStream;
 			AssetManager.GetPrimaryAssetIdList(QuestAssetType, QuestAssetsIds);
-			//const int32 QuestsToTake = FMath::RandRange(0, MaxNodeChildren);
-			for (int i = 0; i < QuestAssetsIds.Num(); ++i)
+			for (int32 i = 0; i < QuestAssetsIds.Num(); ++i)
 			{
-				//const int32 RandIndex = FMath::RandHelper(QuestAssetsIds.Num());
-				//FPrimaryAssetId SampledAssetId = QuestAssetsIds[RandIndex];
 				FAssetData AssetData;
 				AssetManager.GetPrimaryAssetData(QuestAssetsIds[i], AssetData);
-				const auto Temp = Cast<UBlueprint>(AssetData.GetAsset());
-				UQuest* LoadedQuest = NewObject<UQuest>(this, Temp->GeneratedClass);
-				if (LoadedQuest)
+				FSoftObjectPath QuestClassPtr = AssetData.ToSoftObjectPath();
+				QuestClassPtr.SetPath(QuestClassPtr.GetAssetPathString().Append("_C"));
+				UObject* QuestClass = AssetStream.LoadSynchronous(QuestClassPtr);
+				/*
+				TArray<UObject*> AssetObjects;
+				FindOrLoadAssetsByPath(AssetData.PackagePath.ToString(), AssetObjects, EngineUtils::ATL_Class);
+				UBlueprintGeneratedClass* QuestClass = nullptr;
+				const FString AssetName = AssetData.AssetName.ToString().Append("_C");
+				for (int32 j = 0; j < AssetObjects.Num(); ++j)
 				{
-					AvailableQuests.Add(LoadedQuest);
-					//QuestAssetsIds.RemoveAtSwap(RandIndex);
+					if (AssetObjects[j]->GetName().Compare(AssetName) == 0)
+					{
+						QuestClass = Cast<UBlueprintGeneratedClass>(AssetObjects[j]);
+						break;
+					}
+				}
+				*/
+				if (QuestClass)
+				{
+					UQuest* LoadedQuest =
+						NewObject<UQuest>(this, Cast<UBlueprintGeneratedClass>(QuestClass));
+					if (LoadedQuest)
+					{
+						AvailableQuests.Add(LoadedQuest);
+					}
 				}
 			}
 		}
@@ -111,9 +137,12 @@ void AFAGameMode::BeginPlay()
 		SpacePlane->SetUp(PassengerSeats);
 	}
 
-	//FillPassengers();
-	//CargoDeliveryManager->GenerateCargoes(WorldMap->GetCurrentNode());
-
+	{
+		USpacePlaneHealthComponent* HealthComponent = SpacePlane->GetSpacePlaneHealth();
+		check(HealthComponent);
+		HealthComponent->SpacePlaneDie.AddDynamic(this, &AFAGameMode::SpaceShipBrokenHandle);
+	}
+	
 	PostLoadInitialization();
 }
 
@@ -121,7 +150,7 @@ void AFAGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 
-	SaveGameComponent->SaveGame();
+	//SaveGameComponent->SaveGame();
 }
 
 void AFAGameMode::PostLoadInitialization()
@@ -168,16 +197,23 @@ void AFAGameMode::RemoveFinishedQuest(UQuest* FinishedQuest)
 	TakenQuests.Remove(FinishedQuest);
 	FinishedQuest->QuestFinished.Clear();
 	TakenQuestsChanged.Broadcast();
+	QuestCompleted.Broadcast(FinishedQuest);
 }
 
 void AFAGameMode::InitQuestsFromSaveFile(
+	const TArray<UQuest*>& AvailableQuestsLoaded,
 	const TArray<UQuest*>& TakenQuestsLoaded,
 	const TArray<UQuest*>& PlacedQuestsLoaded,
 	const TArray<UQuest*>& FinishedQuestsLoaded)
 {
+	AvailableQuests = AvailableQuestsLoaded;
 	TakenQuests = TakenQuestsLoaded;
 	PlacedQuests = PlacedQuestsLoaded;
 	FinishedQuests = FinishedQuestsLoaded;
+	for (UQuest* Quest :TakenQuests)
+	{
+		Quest->QuestFinished.AddUObject(this, &AFAGameMode::RemoveFinishedQuest);
+	}
 }
 
 void AFAGameMode::ExpandMapNode(UMapNode* NodeToExpand)
@@ -227,6 +263,10 @@ void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation, const bool IsIn
 
 	// GENERATE CARGO
 	CargoDeliveryManager->GenerateCargoes(TargetLocation);
+
+	// LOCATION LOAD HANDLE?
+	// ...
+	LocationLoaded.Broadcast(TargetLocation);
 }
 
 void AFAGameMode::LetPassengerInPlane(AFABasePassenger* PassengerToLetIn)
@@ -409,4 +449,9 @@ void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitia
 		FillPassengers();
 	else if (IsInitial)
 		FillPassengersPostLoad();
+}
+
+void AFAGameMode::SpaceShipBrokenHandle_Implementation()
+{
+	// PLACEHOLDER
 }

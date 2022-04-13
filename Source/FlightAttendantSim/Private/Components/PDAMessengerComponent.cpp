@@ -27,6 +27,7 @@ void UPDAMessengerComponent::AddScheduledMessage(const FPDAMessage& ScheduledMes
 	{
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UPDAMessengerComponent::AddMessage, ScheduledMessage);
+		MessageTimerHandle = FTimerHandle();
 		World->GetTimerManager().SetTimer(MessageTimerHandle, TimerDelegate, TimeToWait, false);
 	}
 }

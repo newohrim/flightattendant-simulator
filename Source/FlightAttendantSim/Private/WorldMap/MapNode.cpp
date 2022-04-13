@@ -19,6 +19,19 @@ int32 UMapNode::GetGraphDepth() const
 	return MaxDepth + 1;
 }
 
+int32 UMapNode::GetGraphMaxAbsHeight() const
+{
+	if (ChildNodes.Num() == 0)
+		return FMath::Abs(HeightLevel);
+	
+	if (ChildNodes.Num() == 1)
+		return ChildNodes[0]->GetGraphMaxAbsHeight();
+
+	return FMath::Max(
+		ChildNodes[0]->GetGraphMaxAbsHeight(),
+		ChildNodes.Last()->GetGraphMaxAbsHeight());
+}
+
 void UMapNode::UpdateHeightLevels(int32 HeightIncrement)
 {
 	HeightLevel += HeightIncrement;

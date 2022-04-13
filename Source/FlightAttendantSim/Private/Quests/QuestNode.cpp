@@ -14,7 +14,9 @@ void UQuestNode::Init()
 
 void UQuestNode::CompleteNode(UQuestTransition* ExecutedTransition)
 {
-	NodeCompleted.ExecuteIfBound(ExecutedTransition);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetName());
+	const bool Success = NodeCompleted.ExecuteIfBound(ExecutedTransition);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), static_cast<int32>(Success));
 }
 
 UQuestTransition* UQuestNode::AddTransition(const FString& QuestDescription, UQuestTransition* Transition)

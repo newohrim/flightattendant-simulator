@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetGraphDepth() const;
 	UFUNCTION(BlueprintCallable)
+	int32 GetGraphMaxAbsHeight() const;
+	UFUNCTION(BlueprintCallable)
 	int32 GetDepth() const { return Depth; }
 	UFUNCTION(BlueprintCallable)
 	void SetDepth(const int32 NewDepth) { Depth = NewDepth; }

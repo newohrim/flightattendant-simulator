@@ -21,8 +21,11 @@ class UPDAMessengerComponent;
 class UFlightControlComponent;
 class UGameEconomyComponent;
 class USaveGameComponent;
+class UWaypointsComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLocationLoaded, const UMapNode*, LoadedLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestsCompleted, const UQuest*, UQuest);
 
 /**
  * 
@@ -33,6 +36,11 @@ class FLIGHTATTENDANTSIM_API AFAGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FLocationLoaded LocationLoaded;
+	UPROPERTY(BlueprintAssignable)
+	FQuestsCompleted QuestCompleted;
+	
 	AFAGameMode();
 	
 	UPROPERTY(BlueprintAssignable)
@@ -43,16 +51,18 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void PostLoadInitialization();
 	void LocationLoadedHandle();
-	
+
+	UFUNCTION(BlueprintCallable)
 	void TakeQuest(TSubclassOf<UQuest> TakenQuest);
 
+	const TArray<UQuest*>& GetAvailableQuests() const { return AvailableQuests; }
 	const TArray<UQuest*>& GetTakenQuests() const { return TakenQuests; }
 	const TArray<UQuest*>& GetPlacedQuests() const { return PlacedQuests; }
 	const TArray<UQuest*>& GetFinishedQuests() const { return FinishedQuests; }
 	void InitQuestsFromSaveFile(
+		const TArray<UQuest*>& AvailableQuestsLoaded,
 		const TArray<UQuest*>& TakenQuestsLoaded,
-		const TArray<UQuest*>& PlacedQuestsLoaded,
-		const TArray<UQuest*>& FinishedQuestsLoaded);
+		const TArray<UQuest*>& PlacedQuestsLoaded, const TArray<UQuest*>& FinishedQuestsLoaded);
 
 	UFUNCTION(BlueprintCallable)
 	void ExpandMapNode(UMapNode* NodeToExpand);
@@ -80,6 +90,8 @@ public:
 	UGameEconomyComponent* GetEconomyComponent() const { return EconomyComponent; }
 
 	USaveGameComponent* GetSaveGameComponent() const { return SaveGameComponent; }
+
+	UWaypointsComponent* GetWaypointsComponent() const { return WaypointsComponent; }
 
 	UMapGraph* GetWorldMap() const { return WorldMap; }
 
@@ -121,6 +133,8 @@ protected:
 	UGameEconomyComponent* EconomyComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USaveGameComponent* SaveGameComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UWaypointsComponent* WaypointsComponent;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
@@ -154,6 +168,9 @@ protected:
 	void SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitial);
 
 	void ChangeLocation(const UMapNode* TargetLocation, const bool IsInitial = false);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SpaceShipBrokenHandle();
 
 private:
 	UPROPERTY()

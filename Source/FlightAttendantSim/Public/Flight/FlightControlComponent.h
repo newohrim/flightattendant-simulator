@@ -17,8 +17,10 @@ class FLIGHTATTENDANTSIM_API UFlightControlComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
 	FPlayerArrived PlayerArrived;
 
+	UPROPERTY(BlueprintAssignable)
 	FPlayerStartTravel PlayerStartTravel;
 	
 	// Sets default values for this component's properties
@@ -31,6 +33,12 @@ public:
 	// Is called by a timer to stop the current flight and arrive to destination
 	UFUNCTION(BlueprintCallable)
 	void EndFlight();
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsInFlight() const { return IsInFlight; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetFlightTimeRemaining() const { return GetWorld()->GetTimerManager().GetTimerRemaining(FlightTimer); }
 
 protected:
 	FTimerHandle FlightTimer;
@@ -49,4 +57,7 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnFlightEnd();
+
+private:
+	bool IsInFlight = false;
 };

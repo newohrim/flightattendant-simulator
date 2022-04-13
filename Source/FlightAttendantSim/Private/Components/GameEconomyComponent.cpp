@@ -31,6 +31,7 @@ void UGameEconomyComponent::AddPlayerMoneyScheduled(const int64 Value, const flo
 	{
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UGameEconomyComponent::AddPlayerMoney, Value);
+		EconomyTimerHandle = FTimerHandle();
 		World->GetTimerManager().SetTimer(EconomyTimerHandle, TimerDelegate, TimeToWait, false);
 	}
 }
@@ -51,6 +52,7 @@ void UGameEconomyComponent::WithdrawPlayerMoneyScheduled(const int64 Value, cons
 	{
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(this, &UGameEconomyComponent::WithdrawPlayerMoney, Value);
+		EconomyTimerHandle = FTimerHandle();
 		World->GetTimerManager().SetTimer(EconomyTimerHandle, TimerDelegate, TimeToWait, false);
 	}
 }

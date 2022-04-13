@@ -13,8 +13,6 @@ struct FCharacterInfo
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY()
-	TAssetSubclassOf<AFABaseCharacter> CharacterToSpawn;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName CharacterName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

@@ -42,6 +42,9 @@ struct FQuestData
 
 	UPROPERTY()
 	int32 CurrentNodeIndex = -1;
+
+	UPROPERTY()
+	TArray<int32> PlacedNodeIndices;
 };
 
 USTRUCT()
@@ -108,6 +111,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = WorldMap)
 	TArray<FMapNodeData> WorldMap;
+	
+	UPROPERTY(VisibleAnywhere, Category = Quests)
+	TArray<FQuestData> AvailableQuests;
 
 	UPROPERTY(VisibleAnywhere, Category = Quests)
 	TArray<FQuestData> TakenQuests;

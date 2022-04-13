@@ -7,6 +7,7 @@
 
 void UQuestTransition::ExecuteTransition()
 {
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetName());
 	TransitionComplete.ExecuteIfBound(this);
 }
 

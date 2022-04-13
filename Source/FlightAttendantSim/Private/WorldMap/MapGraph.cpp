@@ -80,4 +80,6 @@ void UMapGraph::MapGraphChangedHandle()
 	}
 	NodesPairs.Empty();
 	RootNode->GetConnectedPairs(NodesPairs);
+	CurrentMaxDepth = GetGraphDepth();
+	CurrentMaxHeight = RootNode->GetGraphMaxAbsHeight();
 }

@@ -25,8 +25,10 @@ public:
 	// Sets default values for this component's properties
 	USaveGameComponent();
 
+	UFUNCTION(BlueprintCallable)
 	bool SaveGame();
 
+	UFUNCTION(BlueprintCallable)
 	bool LoadGame();
 
 protected:
@@ -41,12 +43,12 @@ protected:
 	virtual void GatherLoadedSaveFile(UFASaveGame* SaveGame);
 
 private:
-	static void PopulateQuests(TArray<FQuestData>& ToList, const TArray<UQuest*>& FromList);
+	static void PopulateQuests(TArray<FQuestData>& ToList, const TArray<UQuest*>& FromList, UFASaveGame* SaveGame);
 	
 	static TArray<UQuest*> GatherQuests(
 		const TArray<FQuestData>& FromList,
 		const EQuestStatus QuestStatus,
-		UObject* Outer);
+		UFASaveGame* SaveGame, UObject* Outer);
 
 	static void PopulateCargoes(
 		TArray<FCargoData>& ToList,

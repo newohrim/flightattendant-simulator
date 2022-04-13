@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
 #include "FAGameInstance.generated.h"
 
 
@@ -15,5 +14,7 @@ class FLIGHTATTENDANTSIM_API UFAGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-	
+public:
+	UPROPERTY(BlueprintReadWrite)
+	bool IsNewGame = true;
 };

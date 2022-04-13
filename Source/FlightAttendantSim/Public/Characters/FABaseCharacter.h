@@ -61,7 +61,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsSitting = false;
 	UPROPERTY(BlueprintReadOnly)
-	ASeat* CurrentSeat;
+	ASeat* CurrentSeat = nullptr;
 
 private:
 	bool IsMoving = false;

@@ -24,9 +24,12 @@ void UFASaveGame::PostLoadInitialization()
 {
 	MapGraphTraversalRead();
 	USpacePlaneComponent* SpacePlaneComponent = SpacePlaneData.SpacePlane.Get();
-	DeserializeObject(SpacePlaneComponent, SpacePlaneData.SpacePlaneData);
-	DeserializeObject(SpacePlaneComponent->GetSpacePlaneHealth(), SpacePlaneData.HealthComponentData);
-	DeserializeObject(SpacePlaneComponent->GetCargoCell(), SpacePlaneData.CargoCellData);
+	if (SpacePlaneComponent)
+	{
+		DeserializeObject(SpacePlaneComponent, SpacePlaneData.SpacePlaneData);
+		DeserializeObject(SpacePlaneComponent->GetSpacePlaneHealth(), SpacePlaneData.HealthComponentData);
+		DeserializeObject(SpacePlaneComponent->GetCargoCell(), SpacePlaneData.CargoCellData);
+	}
 }
 
 void UFASaveGame::SaveWorldMap(const UMapGraph* MapGraph)

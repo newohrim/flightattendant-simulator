@@ -14,12 +14,17 @@ struct FDocsInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString LastName;
-	UPROPERTY(BlueprintReadOnly)
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString FirstName;
-	UPROPERTY(BlueprintReadOnly)
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString PassengerId;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool IsWanted = false;
 
 	static FString GenerateId();
 };

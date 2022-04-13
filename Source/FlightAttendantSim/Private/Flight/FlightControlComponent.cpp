@@ -26,6 +26,7 @@ void UFlightControlComponent::StartFlight(UMapNode* Destination)
 		FlightTimerDel.BindUObject(this, &UFlightControlComponent::EndFlight);
 		World->GetTimerManager().SetTimer(FlightTimer, FlightTimerDel, FlightDuration, false);
 
+		IsInFlight = true;
 		if (DestinationNode.IsValid())
 			PlayerStartTravel.Broadcast(Destination);
 		OnFlightStart();
@@ -34,6 +35,7 @@ void UFlightControlComponent::StartFlight(UMapNode* Destination)
 
 void UFlightControlComponent::EndFlight()
 {
+	IsInFlight = false;
 	if (DestinationNode.IsValid())
 		PlayerArrived.Broadcast(DestinationNode.Get());
 	

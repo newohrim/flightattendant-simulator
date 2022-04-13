@@ -3,6 +3,7 @@
 
 #include "SaveGame/SaveGameComponent.h"
 
+#include "EngineUtils.h"
 #include "FAGameMode.h"
 #include "WorldMap/LocationInfo.h"
 #include "Components/GameEconomyComponent.h"
@@ -14,6 +15,7 @@
 #include "SpacePlane/CargoCellComponent.h"
 #include "SpacePlane/SpacePlaneComponent.h"
 #include "Components/PassengersManagerComponent.h"
+#include "Engine/StreamableManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaveGameComponent, All, All);
 
@@ -89,9 +91,10 @@ void USaveGameComponent::PopulateSaveFile(UFASaveGame* SaveGame)
 		SaveGame->SaveWorldMap(GameMode->GetWorldMap());
 		SaveGame->SaveSpacePlane(GameMode->GetSpacePlane());
 		SaveGame->SavePassengers(GameMode->GetPassengerManager());
-		PopulateQuests(SaveGame->TakenQuests, GameMode->GetTakenQuests());
-		PopulateQuests(SaveGame->PlacedQuests, GameMode->GetPlacedQuests());
-		PopulateQuests(SaveGame->FinishedQuests, GameMode->GetFinishedQuests());
+		PopulateQuests(SaveGame->AvailableQuests, GameMode->GetAvailableQuests(), SaveGame);
+		PopulateQuests(SaveGame->TakenQuests, GameMode->GetTakenQuests(), SaveGame);
+		PopulateQuests(SaveGame->PlacedQuests, GameMode->GetPlacedQuests(), SaveGame);
+		PopulateQuests(SaveGame->FinishedQuests, GameMode->GetFinishedQuests(), SaveGame);
 		PopulateCargoes(
 			SaveGame->AvailableCargoes,
 			GameMode->GetCargoManager()->GetAvailableCargoes(),
@@ -125,19 +128,26 @@ void USaveGameComponent::GatherLoadedSaveFile(UFASaveGame* SaveGame)
 		GatherCargoes(SaveGame->AvailableCargoes, SaveGame,
 			[&CargoCellComponent, &PassengersCount](const FCargoInfo& Cargo)->void{ CargoCellComponent->AddCargo(Cargo, PassengersCount); });
 		GameMode->InitQuestsFromSaveFile(
-			GatherQuests(SaveGame->TakenQuests, EQuestStatus::Taken, GameMode),
-			GatherQuests(SaveGame->PlacedQuests, EQuestStatus::Waiting, GameMode),
-			GatherQuests(SaveGame->FinishedQuests, EQuestStatus::Completed, GameMode));
+			GatherQuests(SaveGame->AvailableQuests, EQuestStatus::Waiting, SaveGame, GameMode),
+			GatherQuests(SaveGame->TakenQuests, EQuestStatus::Taken, SaveGame, GameMode),
+			GatherQuests(SaveGame->PlacedQuests, EQuestStatus::Waiting, SaveGame, GameMode),
+			GatherQuests(SaveGame->FinishedQuests, EQuestStatus::Completed, SaveGame, GameMode));
 	}
 }
 
-void USaveGameComponent::PopulateQuests(TArray<FQuestData>& ToList, const TArray<UQuest*>& FromList)
+void USaveGameComponent::PopulateQuests(TArray<FQuestData>& ToList, const TArray<UQuest*>& FromList, UFASaveGame* SaveGame)
 {
 	for (const UQuest* TakenQuest : FromList)
 	{
+		TArray<int32> NodeIndexes;
+		for (const ULocationInfo* LocInfo : TakenQuest->GetLocationsToGenerate())
+		{
+			NodeIndexes.Add(SaveGame->FindNode(LocInfo->CorrespondingNode));
+		}
 		FQuestData QuestData = {
 			TakenQuest->GetClass(),
-			TakenQuest->GetCurrentNode()->GetNodeIndex()
+			TakenQuest->GetCurrentNode()->GetNodeIndex(),
+			NodeIndexes
 		};
 		ToList.Add(QuestData);
 	}
@@ -146,12 +156,49 @@ void USaveGameComponent::PopulateQuests(TArray<FQuestData>& ToList, const TArray
 TArray<UQuest*> USaveGameComponent::GatherQuests(
 	const TArray<FQuestData>& FromList,
 	const EQuestStatus QuestStatus,
-	UObject* Outer)
+	UFASaveGame* SaveGame, UObject* Outer)
 {
 	TArray<UQuest*> ResultQuests;
 	for (const FQuestData& QuestData : FromList)
 	{
-		UQuest* Quest = NewObject<UQuest>(Outer, QuestData.QuestClass.Get());
+		const UClass* QuestClass = QuestData.QuestClass.Get();
+		if (!QuestClass)
+		{
+			/*
+			FindOrLoadAssetsByPath(QuestData, AssetObjects, EngineUtils::ATL_Class);
+			UBlueprintGeneratedClass* QuestClass = nullptr;
+			const FString AssetName = AssetData.AssetName.ToString().Append("_C");
+			for (int32 j = 0; j < AssetObjects.Num(); ++j)
+			{
+				if (AssetObjects[j]->GetName().Compare(AssetName) == 0)
+				{
+					QuestClass = Cast<UBlueprintGeneratedClass>(AssetObjects[j]);
+					break;
+				}
+			}
+			if (QuestClass)
+			{
+			*/
+
+			FSoftObjectPath TempClass = QuestData.QuestClass.ToSoftObjectPath();
+			if (!QuestData.QuestClass.ToString().EndsWith("_C"))
+			{
+				TempClass.SetPath(
+					QuestData.QuestClass.ToSoftObjectPath().GetAssetPathString().Append("_C"));
+			}
+			QuestClass = Cast<UClass>(TempClass.TryLoad());
+			if (!QuestClass)
+			{
+				continue;
+			}
+		}
+		UQuest* Quest = NewObject<UQuest>(Outer, QuestClass);
+		auto& Locations = Quest->GetLocationsToGenerate();
+		for (int32 i = 0; i < Locations.Num(); ++i)
+		{
+			Locations[i]->CorrespondingNode =
+				SaveGame->WorldMap[QuestData.PlacedNodeIndices[i]].LocationInfo.Get()->CorrespondingNode;
+		}
 		Quest->SetCurrentNodeIndex(QuestData.CurrentNodeIndex);
 		Quest->QuestStatus = QuestStatus;
 		// I know the actual pointer to current node after this call
@@ -204,7 +251,7 @@ TArray<FPassengerSpawnParams> USaveGameComponent::GatherPassengers(
 	TArray<FPassengerSpawnParams> SpawnParams;
 	for (FPassengerData& PassengerData : FromList)
 	{
-		if (PassengerData.LocationHeadingToIndex > 0)
+		if (PassengerData.LocationHeadingToIndex >= 0)
 		{
 			PassengerData.SpawnParams.LocationHeadingTo =
 				SaveGame->WorldMap[PassengerData.LocationHeadingToIndex].LocationInfo;

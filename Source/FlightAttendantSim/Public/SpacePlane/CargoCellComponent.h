@@ -7,6 +7,10 @@
 #include "Components/ActorComponent.h"
 #include "CargoCellComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCargoLoadChanged);
+
+class UMapNode;
+
 /**
  * 
  */
@@ -16,6 +20,9 @@ class FLIGHTATTENDANTSIM_API UCargoCellComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FCargoLoadChanged CargoLoadChanged;
+	
 	UCargoCellComponent();
 
 	const TArray<FCargoInfo>& GetTakenCargoes() const { return TakenCargoes; }
@@ -38,4 +45,9 @@ protected:
 	int32 Capacity = 100;
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FCargoInfo> TakenCargoes;
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void PlayerArrivedHandle(UMapNode* Destination);
 };

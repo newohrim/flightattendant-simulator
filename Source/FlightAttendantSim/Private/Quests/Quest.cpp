@@ -15,7 +15,7 @@ void UQuest::Init_Implementation()
 
 UQuest::UQuest()
 {
-	UE_LOG(LogTemp, Display, TEXT("%s"), *GetFullName());
+	UE_LOG(LogTemp, Display, TEXT("%s PARENT: %s"), *GetFullName(), *GetOuter()->GetFullName());
 }
 
 void UQuest::SetCurrentNode(UQuestNode* Node)
@@ -28,6 +28,7 @@ void UQuest::SetCurrentNode(UQuestNode* Node)
 	
 	CurrentNode->NodeCompleted.BindUObject(this, &UQuest::ChangeNode);
 	CurrentNode->ExecutePreEvents();
+	UE_LOG(LogTemp, Warning, TEXT("PRE EVENTS"));
 }
 
 TArray<FString> UQuest::GetCurrentGoals() const
@@ -63,17 +64,19 @@ void UQuest::ChangeNode(UQuestTransition* ExecutedTransition)
 	if (QuestStatus != EQuestStatus::Taken)
 		return;
 
-	if (CurrentNode->IsLast())
-	{
-		FinishQuest();
-	}
-	else if (CurrentNode->ContainsTransition(ExecutedTransition))
+	if (CurrentNode->ContainsTransition(ExecutedTransition))
 	{
 		ExecutedTransition->ExecutePostEvents();
 		CurrentNode->NodeCompleted.Unbind();
-		//CurrentNode = ExecutedTransition->GetTargetNode();
 		SetCurrentNode(ExecutedTransition->GetTargetNode());
+		// Unable to place this condition inside SetCurrentNode,
+		// because it is being called during quest construction.
+		if (CurrentNode->IsLast())
+		{
+			FinishQuest();
+		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetName());
 }
 
 void UQuest::FinishQuest()
