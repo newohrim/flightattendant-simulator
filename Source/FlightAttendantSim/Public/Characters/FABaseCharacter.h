@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/ObjectReceiver.h"
 #include "Characters/CharacterInfo.h"
 #include "../../../../Plugins/DlgSystem-v15/Source/DlgSystem/Public/DlgDialogueParticipant.h"
 #include "GameFramework/Character.h"
@@ -16,7 +17,7 @@ class UActionExecutorComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTargetReached);
 
 UCLASS()
-class FLIGHTATTENDANTSIM_API AFABaseCharacter : public ACharacter, public IDlgDialogueParticipant
+class FLIGHTATTENDANTSIM_API AFABaseCharacter : public ACharacter, public IDlgDialogueParticipant, public IObjectReceiver
 {
 	GENERATED_BODY()
 
