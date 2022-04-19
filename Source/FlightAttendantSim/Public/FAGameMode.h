@@ -22,6 +22,7 @@ class UFlightControlComponent;
 class UGameEconomyComponent;
 class USaveGameComponent;
 class UWaypointsComponent;
+class ILocationGenerator;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLocationLoaded, const UMapNode*, LoadedLocation);
@@ -98,6 +99,8 @@ public:
 	USpacePlaneComponent* GetSpacePlane() const { return SpacePlane; }
 
 	void ShowCargoPickMenu() const;
+
+	void SetPlayerInitialTransform(const FTransform& InitTransform) { InitialPlayerTransform = InitTransform; }
 	
 protected:
 	// The depth of final node
@@ -142,6 +145,8 @@ protected:
 	// Player's spaceship abstraction
 	UPROPERTY(BlueprintReadOnly)
 	USpacePlaneComponent* SpacePlane = nullptr;
+	UPROPERTY(BlueprintReadWrite)
+	TScriptInterface<ILocationGenerator> LocationGenerator;
 	
 	// Quests taken by player.
 	UPROPERTY(BlueprintReadOnly)
@@ -155,6 +160,8 @@ protected:
 	// Finished by Player quests
 	UPROPERTY(BlueprintReadOnly)
 	TArray<UQuest*> FinishedQuests;
+
+	FTransform InitialPlayerTransform;
 
 	TArray<UQuest*> SampleQuestList(const int32 Num);
 	void UpdatePlacedQuests(const UMapNode* ExpandedNode, TArray<UQuest*>& QuestsToPlace);

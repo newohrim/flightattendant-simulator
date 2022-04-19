@@ -34,6 +34,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TakeCargoDeliveryOffer(const FCargoInfo& Cargo);
 
+	void AddCargoDeliveryOffer(const FCargoInfo& Cargo) { Cargoes.Add(Cargo); }
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "CargoGeneration")
 	int32 MinCargoesCount = 1;

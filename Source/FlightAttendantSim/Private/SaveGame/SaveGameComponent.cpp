@@ -87,7 +87,9 @@ void USaveGameComponent::PopulateSaveFile(UFASaveGame* SaveGame)
 	{
 		const AFAGameMode* GameMode = FAGAMEMODE;
 		const UGameEconomyComponent* EconomyComponent = GameMode->GetEconomyComponent();
-		SaveGame->PlayerMoney = EconomyComponent->GetPlayerMoney();
+		SaveGame->PlayerData.PlayerMoney = EconomyComponent->GetPlayerMoney();
+		SaveGame->PlayerData.PlayerTransform =
+			UGameplayStatics::GetPlayerCharacter(World, 0)->GetActorTransform();
 		SaveGame->SaveWorldMap(GameMode->GetWorldMap());
 		SaveGame->SaveSpacePlane(GameMode->GetSpacePlane());
 		SaveGame->SavePassengers(GameMode->GetPassengerManager());
@@ -113,7 +115,8 @@ void USaveGameComponent::GatherLoadedSaveFile(UFASaveGame* SaveGame)
 	{
 		AFAGameMode* GameMode = FAGAMEMODE;
 		UGameEconomyComponent* EconomyComponent = GameMode->GetEconomyComponent();
-		EconomyComponent->SetPlayerMoney(SaveGame->PlayerMoney);
+		EconomyComponent->SetPlayerMoney(SaveGame->PlayerData.PlayerMoney);
+		GameMode->SetPlayerInitialTransform(SaveGame->PlayerData.PlayerTransform);
 		UMapGraph* WorldMap = GameMode->GetWorldMap();
 		WorldMap->GenerateMap(
 			ReconstructWorldMap(SaveGame->GetRootNode(), SaveGame));
@@ -122,10 +125,10 @@ void USaveGameComponent::GatherLoadedSaveFile(UFASaveGame* SaveGame)
 			SaveGame->SpacePlaneData.AssignedPassengers, SaveGame));
 		UCargoManagerComponent* CargoManager = GameMode->GetCargoManager();
 		GatherCargoes(SaveGame->AvailableCargoes, SaveGame,
-			[&CargoManager](const FCargoInfo& Cargo)->void{ CargoManager->TakeCargoDeliveryOffer(Cargo); });
+			[&CargoManager](const FCargoInfo& Cargo)->void{ CargoManager->AddCargoDeliveryOffer(Cargo); });
 		UCargoCellComponent* CargoCellComponent = GameMode->GetSpacePlane()->GetCargoCell();
 		const int32 PassengersCount = GameMode->GetSpacePlane()->GetPassengersCount();
-		GatherCargoes(SaveGame->AvailableCargoes, SaveGame,
+		GatherCargoes(SaveGame->TakenCargoes, SaveGame,
 			[&CargoCellComponent, &PassengersCount](const FCargoInfo& Cargo)->void{ CargoCellComponent->AddCargo(Cargo, PassengersCount); });
 		GameMode->InitQuestsFromSaveFile(
 			GatherQuests(SaveGame->AvailableQuests, EQuestStatus::Waiting, SaveGame, GameMode),

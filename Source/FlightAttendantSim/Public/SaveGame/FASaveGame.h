@@ -94,6 +94,21 @@ struct FSpacePlaneData
 	TArray<FPassengerData> AssignedPassengers;
 };
 
+USTRUCT()
+struct FPlayerData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, Category = PlayerStats)
+	FString PlayerName;
+
+	UPROPERTY(VisibleAnywhere, Category = PlayerStats)
+	int32 PlayerMoney = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = PlayerStats)
+	FTransform PlayerTransform;
+};
+
 /**
  * 
  */
@@ -103,11 +118,8 @@ class FLIGHTATTENDANTSIM_API UFASaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, Category = PlayerStats)
-	FString PlayerName;
-
-	UPROPERTY(VisibleAnywhere, Category = PlayerStats)
-	int32 PlayerMoney = 0;
+	UPROPERTY(VisibleAnywhere, Category = PlayerData)
+	FPlayerData PlayerData;
 
 	UPROPERTY(VisibleAnywhere, Category = WorldMap)
 	TArray<FMapNodeData> WorldMap;

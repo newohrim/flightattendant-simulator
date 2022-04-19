@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "FAGameInstance.h"
+#include "Components/LocationGenerator.h"
 #include "SpacePlane/SpacePlaneHealthComponent.h"
 #include "Flight/FlightControlComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -155,7 +156,17 @@ void AFAGameMode::Logout(AController* Exiting)
 
 void AFAGameMode::PostLoadInitialization()
 {
+	// LocationGenerator must be set explicitly by its blueprint implementation
+	check(LocationGenerator);
+	LocationGenerator->EmptyLocation();
+	LocationGenerator->GenerateLocation(
+		WorldMap->GetCurrentNode()->GetLocationInfo());
 	ChangeLocation(WorldMap->GetCurrentNode(), true);
+	if (LoadSucceeded)
+	{
+		UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)
+			->SetActorTransform(InitialPlayerTransform);
+	}
 }
 
 void AFAGameMode::LocationLoadedHandle()
@@ -262,7 +273,8 @@ void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation, const bool IsIn
 	SpawnNewCharacters(TargetLocation, IsInitial);
 
 	// GENERATE CARGO
-	CargoDeliveryManager->GenerateCargoes(TargetLocation);
+	if (!LoadSucceeded)
+		CargoDeliveryManager->GenerateCargoes(TargetLocation);
 
 	// LOCATION LOAD HANDLE?
 	// ...
