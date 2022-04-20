@@ -118,8 +118,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UFlightControlComponent> DefaultFlightControllerClass;
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> DefaultLocationGeneratorClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> CargoPickMenuWidgetClass;

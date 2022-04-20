@@ -156,11 +156,10 @@ void AFAGameMode::Logout(AController* Exiting)
 
 void AFAGameMode::PostLoadInitialization()
 {
-	LocationGenerator = GetWorld()
-		->SpawnActor(DefaultLocationGeneratorClass, &FTransform::Identity);
-	LocationGenerator->Execute_EmptyLocation(LocationGenerator.GetObject());
-	LocationGenerator->Execute_GenerateLocation(
-		LocationGenerator.GetObject(),
+	// LocationGenerator must be set explicitly by its blueprint implementation
+	check(LocationGenerator);
+	LocationGenerator->EmptyLocation();
+	LocationGenerator->GenerateLocation(
 		WorldMap->GetCurrentNode()->GetLocationInfo());
 	ChangeLocation(WorldMap->GetCurrentNode(), true);
 	if (LoadSucceeded)
