@@ -5,7 +5,8 @@
 
 #include "FAGameMode.h"
 #include "PassengerSeat.h"
-#include "PassengersManagerComponent.h"
+#include "Components/PassengersManagerComponent.h"
+#include "SpacePlaneComponent.h"
 #include "WorldMap/LocationInfo.h"
 
 FText AFABasePassenger::GetParticipantCustomText_Implementation(FName ValueName) const
@@ -23,8 +24,29 @@ FText AFABasePassenger::GetParticipantCustomText_Implementation(FName ValueName)
 				*CharacterInfo.CharacterDisplayName.ToString())
 		}
 	}
+	else if (ValueName == "FakeTerrorist")
+	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			auto& AssignedPassengers =
+				FAGAMEMODE->GetSpacePlane()->GetAssignedPassengers();
+			if (AssignedPassengers.Num() >= 2)
+			{
+				const AFABasePassenger* FakeTerrorist = AssignedPassengers[AssignedPassengers.Num() - 2];
+				return FText::FromString(FakeTerrorist->GetDocsInfo().LastName +
+					" " + FakeTerrorist->GetDocsInfo().FirstName);
+			}
+		}
+	}
 	
 	return Super::GetParticipantCustomText_Implementation(ValueName);
+}
+
+FText AFABasePassenger::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
+{
+	return FText::FromString(FString::Printf(
+		TEXT("%s %s"), *DocumentsInfo.LastName, *DocumentsInfo.FirstName));
 }
 
 void AFABasePassenger::ShowDocuments_Implementation() const

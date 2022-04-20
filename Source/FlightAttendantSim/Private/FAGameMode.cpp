@@ -25,6 +25,7 @@
 #include "Components/GameEconomyComponent.h"
 #include "SaveGame/SaveGameComponent.h"
 #include "Components/WaypointsComponent.h"
+#include "Components/ItemsInventoryComponent.h"
 
 AFAGameMode::AFAGameMode()
 {
@@ -42,6 +43,8 @@ AFAGameMode::AFAGameMode()
 		CreateDefaultSubobject<USaveGameComponent>("SaveGameComponent");
 	WaypointsComponent =
 		CreateDefaultSubobject<UWaypointsComponent>("WaypointsComponent");
+	ItemsInventory =
+		CreateDefaultSubobject<UItemsInventoryComponent>("ItemsInventoryComponent");
 
 	const AFAGameMode* DefaultObject = Cast<AFAGameMode>(GetClass()->GetDefaultObject());
 	const TSubclassOf<UFlightControlComponent> DefaultClass = DefaultObject->DefaultFlightControllerClass;
@@ -196,7 +199,7 @@ void AFAGameMode::AddTakenQuest(UQuest* TakenQuest)
 void AFAGameMode::TakeQuest(TSubclassOf<UQuest> TakenQuest)
 {
 	UQuest* Quest = GetQuestFromClass(TakenQuest);
-	if (Quest)
+	if (Quest && Quest->QuestStatus == EQuestStatus::Waiting)
 	{
 		Quest->TakeQuest();
 		AddTakenQuest(Quest);
@@ -253,16 +256,16 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 		return;
 	}
 
+	// EXPAND NODE
+	ExpandMapNode(NodeTravelTo);
+	WorldMap->SetCurrentNode(NodeTravelTo);
+
 	// CHANGE LOCATION
 	ChangeLocation(NodeTravelTo, false);
 	
 	UE_LOG(LogTemp, Display,
 		TEXT("Player succesfully traveled to %s node."),
-		*(NodeTravelTo->GetLocationInfo()->LocationName.ToString()));
-	
-	// EXPAND NODE
-	ExpandMapNode(NodeTravelTo);
-	WorldMap->SetCurrentNode(NodeTravelTo);
+		*NodeTravelTo->GetLocationInfo()->LocationName.ToString());
 }
 
 void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation, const bool IsInitial)
@@ -331,6 +334,19 @@ UQuest* AFAGameMode::GetQuestFromClass(TSubclassOf<UQuest> QuestClass) const
 		TEXT("%s quest wasn't recognise in FAGameMode's Quest Lists."),
 		*(QuestClass.Get()->GetFullName()));
 	return nullptr;
+}
+
+TArray<AFABaseCharacter*> AFAGameMode::GetCharactersOfClass(const TSoftClassPtr<AFABaseCharacter>& CharacterClass) const
+{
+	TArray<AFABaseCharacter*> ResultArray;
+	for (AFABaseCharacter* Character : SpawnedCharacters)
+	{
+		if (Character->IsA(CharacterClass.Get()))
+		{
+			ResultArray.Add(Character);
+		}
+	}
+	return ResultArray;
 }
 
 void AFAGameMode::ShowCargoPickMenu() const
@@ -414,10 +430,12 @@ void AFAGameMode::FillPassengers()
 		FMath::RandRange(MinPassengers, MaxPassengers),
 		MinPassengers,
 		DebugPassengersSpawnLocations.Num());
+	const TArray<UMapNode*> AccessibleNodes =
+		WorldMap->GetCurrentNode()->GetAccessibleNodes();
 	for (int i = 0; i < PassengersNum; ++i)
 	{
 		ULocationInfo* Destination =
-			WorldMap->GetCurrentNode()->GetChildNodes()[FMath::RandHelper(ChildNodesNum)]->GetLocationInfo();
+			AccessibleNodes[FMath::RandHelper(AccessibleNodes.Num())]->GetLocationInfo();
 		PassengersManager->CreatePassenger(
 			DebugPassengersSpawnLocations[i]->GetActorTransform(),
 			Destination)
@@ -451,12 +469,15 @@ void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitia
 	const int32 Num = FMath::Min(CharactersToSpawn.Num(), DebugCharactersSpawnLocations.Num());
 	for (int32 i = 0; i < Num; ++i)
 	{
-		AActor* SpawnedCharacter =
-			World->SpawnActor(
+		AFABaseCharacter* SpawnedCharacter =
+			Cast<AFABaseCharacter>(World->SpawnActor(
 				CharactersToSpawn[i].Get(),
-				&DebugCharactersSpawnLocations[i]->GetActorTransform());
+				&DebugCharactersSpawnLocations[i]->GetActorTransform()));
 		if (SpawnedCharacter)
+		{
+			SpawnedCharacter->SpawnDefaultController();
 			SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
+		}
 	}
 	if (!LoadSucceeded || !IsInitial)
 		FillPassengers();

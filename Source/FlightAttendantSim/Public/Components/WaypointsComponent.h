@@ -16,14 +16,17 @@ public:
 	UWaypointsComponent();
 
 	UFUNCTION(BlueprintCallable)
-	const FTransform& GetWaypointByName(const FString& Name) const
+	bool GetWaypointByName(const FString& Name, FTransform& Result) const
 	{
 		const AActor* WaypointActor = Waypoints[Name];
 		if (WaypointActor)
-			return Waypoints[Name]->GetActorTransform();
+		{
+			Result = Waypoints[Name]->GetActorTransform();
+			return true;
+		}
 		UE_LOG(LogTemp, Warning,
 			TEXT("Unable to find a waypoint named %s."), *Name);
-		return GetOwner()->GetActorTransform();
+		return false;
 	}
 
 protected:

@@ -176,6 +176,8 @@ void UPassengersManagerComponent::PassengersLeavePlane(const UMapNode* Destinati
 	const UWaypointsComponent* Waypoints = GameMode->GetWaypointsComponent();
 	USpacePlaneComponent* SpacePlane = GameMode->GetSpacePlane();
 	int64 TransitPayment = 0;
+	FTransform LeavePlaneWaypointTransform;
+	Waypoints->GetWaypointByName(LeavePlaneWaypoint, LeavePlaneWaypointTransform);
 	for (AFABasePassenger* Passenger : SpawnedPassengers)
 	{
 		if (Passenger->IsAssigned() &&
@@ -186,7 +188,7 @@ void UPassengersManagerComponent::PassengersLeavePlane(const UMapNode* Destinati
 			const TArray<UCharacterAction*> LeavePlaneActions = {
 				UCharacterStandAction::CreateCharacterStandAction(this),
 				UCharacterMoveAction::CreateCharacterMoveAction(
-					Waypoints->GetWaypointByName(LeavePlaneWaypoint).GetLocation(),
+					LeavePlaneWaypointTransform.GetLocation(),
 					this)
 			};
 			UActionExecutorComponent* ActionExecutor =

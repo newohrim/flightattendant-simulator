@@ -49,6 +49,7 @@ public:
 	void SetParentNode(UMapNode* NewParentNode) { ParentNode = NewParentNode; }
 	ULocationInfo* GetLocationInfo() const { return LocationInfo; }
 	void SetLocationInfo(ULocationInfo* LocInfo) { LocationInfo = LocInfo; }
+	TArray<UMapNode*> GetAccessibleNodes() const;
 
 	void UpdateHeightLevels(int32 HeightIncrement);
 	void MakeGridLayout(int32& X);

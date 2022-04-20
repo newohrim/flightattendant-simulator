@@ -1,0 +1,39 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "ItemsInventoryComponent.generated.h"
+
+UENUM(BlueprintType)
+enum EInventoryItemType
+{
+	Hypercharge		UMETA(DisplayName = "Hypercharge"),
+	DefaultFood		UMETA(DisplayName = "DefaultFood"),
+	INVENTORY_ITEMS_NR
+};
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class FLIGHTATTENDANTSIM_API UItemsInventoryComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this component's properties
+	UItemsInventoryComponent();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetItemsCount(const TEnumAsByte<EInventoryItemType> ItemType) const;
+
+	UFUNCTION(BlueprintCallable)
+	void AddItem(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count = 1);
+
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItems(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count = 1);
+
+protected:
+	TArray<int32> Items;
+
+	virtual void BeginPlay() override;
+};

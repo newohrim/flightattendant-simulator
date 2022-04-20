@@ -39,8 +39,6 @@ void UFlightControlComponent::EndFlight()
 	if (DestinationNode.IsValid())
 		PlayerArrived.Broadcast(DestinationNode.Get());
 	
-	// TODO: passengers leave plane?
-	
 	OnFlightEnd();
 }
 

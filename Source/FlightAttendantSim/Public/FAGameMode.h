@@ -23,6 +23,7 @@ class UGameEconomyComponent;
 class USaveGameComponent;
 class UWaypointsComponent;
 class ILocationGenerator;
+class UItemsInventoryComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTakenQuestsChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLocationLoaded, const UMapNode*, LoadedLocation);
@@ -78,6 +79,9 @@ public:
 	UQuest* GetQuestFromClass(TSubclassOf<UQuest> QuestClass) const;
 
 	UFUNCTION(BlueprintCallable)
+	TArray<AFABaseCharacter*> GetCharactersOfClass(const TSoftClassPtr<AFABaseCharacter>& CharacterClass) const;
+
+	UFUNCTION(BlueprintCallable)
 	UPassengersManagerComponent* GetPassengerManager() const { return PassengersManager; }
 
 	UFUNCTION(BlueprintCallable)
@@ -93,6 +97,8 @@ public:
 	USaveGameComponent* GetSaveGameComponent() const { return SaveGameComponent; }
 
 	UWaypointsComponent* GetWaypointsComponent() const { return WaypointsComponent; }
+
+	UItemsInventoryComponent* GetItemsInventoryComponent() const { return ItemsInventory; }
 
 	UMapGraph* GetWorldMap() const { return WorldMap; }
 
@@ -115,6 +121,9 @@ protected:
 	TArray<AActor*> DebugCharactersSpawnLocations;
 	UPROPERTY(BlueprintReadWrite, Category = "MapGeneration")
 	TArray<AActor*> DebugPassengersSpawnLocations;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool LoadSucceeded = true;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UFlightControlComponent> DefaultFlightControllerClass;
@@ -140,6 +149,8 @@ protected:
 	USaveGameComponent* SaveGameComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UWaypointsComponent* WaypointsComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UItemsInventoryComponent* ItemsInventory;
 
 	// Global map graph of the game world.
 	UPROPERTY(BlueprintReadOnly)
@@ -184,8 +195,6 @@ protected:
 private:
 	UPROPERTY()
 	TArray<AFABaseCharacter*> SpawnedCharacters;
-
-	bool LoadSucceeded = true;
 
 	void AddTakenQuest(UQuest* TakenQuest);
 	void RemoveFinishedQuest(UQuest* FinishedQuest);

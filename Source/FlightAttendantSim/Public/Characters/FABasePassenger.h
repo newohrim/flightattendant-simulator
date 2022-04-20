@@ -18,6 +18,8 @@ class FLIGHTATTENDANTSIM_API AFABasePassenger : public AFABaseCharacter
 public:
 	virtual FText GetParticipantCustomText_Implementation(FName ValueName) const override;
 
+	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ShowDocuments() const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

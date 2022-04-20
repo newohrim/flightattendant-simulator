@@ -32,6 +32,23 @@ int32 UMapNode::GetGraphMaxAbsHeight() const
 		ChildNodes.Last()->GetGraphMaxAbsHeight());
 }
 
+TArray<UMapNode*> UMapNode::GetAccessibleNodes() const
+{
+	TArray<UMapNode*> ResultArray = ChildNodes;
+	if (ParentNode)
+	{
+		for (UMapNode* Neighbour : ParentNode->GetChildNodes())
+		{
+			if (Neighbour != this)
+			{
+				ResultArray.Add(Neighbour);
+			}
+		}
+	}
+
+	return ResultArray;
+}
+
 void UMapNode::UpdateHeightLevels(int32 HeightIncrement)
 {
 	HeightLevel += HeightIncrement;
