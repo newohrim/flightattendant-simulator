@@ -119,7 +119,7 @@ void UPassengersManagerComponent::LocationLoadedHandle(const UMapNode* Destinati
 		FText::FromString("Transportation Security Agency")
 	};
 	{
-		FString MessageString = "People who are suspended from all flights:";
+		FString MessageString = SuspendMessageTemplate.ToString();
 		for (const FDocsInfo& Doc : WantedCharacters)
 		{
 			MessageString.Append("\n");

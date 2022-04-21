@@ -256,13 +256,17 @@ void AFAGameMode::TravelPlayerToNode(UMapNode* NodeTravelTo)
 		return;
 	}
 
+	// TAKE 1 HYPERCHARGE
+	if (!ItemsInventory->RemoveItems(EInventoryItemType::Hypercharge))
+		return;
+
 	// EXPAND NODE
 	ExpandMapNode(NodeTravelTo);
 	WorldMap->SetCurrentNode(NodeTravelTo);
 
 	// CHANGE LOCATION
 	ChangeLocation(NodeTravelTo, false);
-	
+
 	UE_LOG(LogTemp, Display,
 		TEXT("Player succesfully traveled to %s node."),
 		*NodeTravelTo->GetLocationInfo()->LocationName.ToString());
@@ -419,10 +423,10 @@ void AFAGameMode::RemoveInaccessibleQuests(const UMapNode* NodeOfParentToIgnoreF
 
 void AFAGameMode::FillPassengers()
 {
-	const int32 ChildNodesNum =
-			WorldMap->GetCurrentNode()->GetChildNodes().Num();
-	if (ChildNodesNum == 0)
-		return;
+	//const int32 ChildNodesNum =
+	//		WorldMap->GetCurrentNode()->GetChildNodes().Num();
+	//if (ChildNodesNum == 0)
+	//	return;
 	
 	// Initialized in constructor
 	check(PassengersManager);
@@ -479,10 +483,19 @@ void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitia
 			SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
 		}
 	}
-	if (!LoadSucceeded || !IsInitial)
+	UE_LOG(LogTemp, Display, TEXT("%d"), LoadSucceeded);
+	if (!LoadSucceeded)
+	{
 		FillPassengers();
-	else if (IsInitial)
+	}
+	else if (!IsInitial)
+	{
+		FillPassengers();
+	}
+	else
+	{
 		FillPassengersPostLoad();
+	}
 }
 
 void AFAGameMode::SpaceShipBrokenHandle_Implementation()

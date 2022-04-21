@@ -43,12 +43,20 @@ inline bool UItemsInventoryComponent::RemoveItems(const TEnumAsByte<EInventoryIt
 	return false;
 }
 
+void UItemsInventoryComponent::InitializeSpace()
+{
+	Items.AddDefaulted(INVENTORY_ITEMS_NR);
+	for (int32 i = 0; i < Items.Num(); ++i)
+		Items[i] = 0;
+}
+
 void UItemsInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Items.AddDefaulted(INVENTORY_ITEMS_NR);
-	for (int32 i = 0; i < Items.Num(); ++i)
-		Items[i] = 0;
+	if (!IsPreLoaded)
+	{
+		InitializeSpace();
+	}
 }
 

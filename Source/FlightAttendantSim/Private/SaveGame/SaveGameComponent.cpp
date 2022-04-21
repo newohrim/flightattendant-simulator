@@ -16,6 +16,7 @@
 #include "SpacePlane/SpacePlaneComponent.h"
 #include "Components/PassengersManagerComponent.h"
 #include "Engine/StreamableManager.h"
+#include "Components/ItemsInventoryComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaveGameComponent, All, All);
 
@@ -93,6 +94,8 @@ void USaveGameComponent::PopulateSaveFile(UFASaveGame* SaveGame)
 		SaveGame->SaveWorldMap(GameMode->GetWorldMap());
 		SaveGame->SaveSpacePlane(GameMode->GetSpacePlane());
 		SaveGame->SavePassengers(GameMode->GetPassengerManager());
+		const UItemsInventoryComponent* InventoryComponent = GameMode->GetItemsInventoryComponent();
+		PopulateInventory(InventoryComponent, SaveGame);
 		PopulateQuests(SaveGame->AvailableQuests, GameMode->GetAvailableQuests(), SaveGame);
 		PopulateQuests(SaveGame->TakenQuests, GameMode->GetTakenQuests(), SaveGame);
 		PopulateQuests(SaveGame->PlacedQuests, GameMode->GetPlacedQuests(), SaveGame);
@@ -123,6 +126,8 @@ void USaveGameComponent::GatherLoadedSaveFile(UFASaveGame* SaveGame)
 		UPassengersManagerComponent* PassengerManager = GameMode->GetPassengerManager();
 		PassengerManager->BufferPassengers(GatherPassengers(
 			SaveGame->SpacePlaneData.AssignedPassengers, SaveGame));
+		UItemsInventoryComponent* InventoryComponent = GameMode->GetItemsInventoryComponent();
+		GatherInventory(InventoryComponent, SaveGame);
 		UCargoManagerComponent* CargoManager = GameMode->GetCargoManager();
 		GatherCargoes(SaveGame->AvailableCargoes, SaveGame,
 			[&CargoManager](const FCargoInfo& Cargo)->void{ CargoManager->AddCargoDeliveryOffer(Cargo); });
@@ -263,6 +268,35 @@ TArray<FPassengerSpawnParams> USaveGameComponent::GatherPassengers(
 	}
 
 	return SpawnParams;
+}
+
+void USaveGameComponent::PopulateInventory(
+	const UItemsInventoryComponent* ItemsInventory,
+	UFASaveGame* SaveGame)
+{
+	for (int32 i = 0; i < EInventoryItemType::INVENTORY_ITEMS_NR; ++i)
+	{
+		TEnumAsByte<EInventoryItemType> ItemType(i);
+		SaveGame->PlayerInventory.Add({
+			ItemType,
+			ItemsInventory->GetItemsCount(ItemType)
+		});
+	}
+}
+
+void USaveGameComponent::GatherInventory(
+	UItemsInventoryComponent* ItemsInventory,
+	const UFASaveGame* SaveGame)
+{
+	ItemsInventory->InitializeSpace();
+	ItemsInventory->IsPreLoaded = true;
+	for (const FInventoryItemData& ItemData : SaveGame->PlayerInventory)
+	{
+		if (ItemData.ItemType < EInventoryItemType::INVENTORY_ITEMS_NR)
+		{
+			ItemsInventory->AddItem(ItemData.ItemType, ItemData.Count);
+		}
+	}
 }
 
 UMapNode* USaveGameComponent::ReconstructWorldMap(

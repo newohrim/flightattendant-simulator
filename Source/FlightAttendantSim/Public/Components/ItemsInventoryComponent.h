@@ -11,6 +11,8 @@ enum EInventoryItemType
 {
 	Hypercharge		UMETA(DisplayName = "Hypercharge"),
 	DefaultFood		UMETA(DisplayName = "DefaultFood"),
+
+	// Last element to always know how many different enum values are possible
 	INVENTORY_ITEMS_NR
 };
 
@@ -20,6 +22,8 @@ class FLIGHTATTENDANTSIM_API UItemsInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	bool IsPreLoaded = false;
+	
 	// Sets default values for this component's properties
 	UItemsInventoryComponent();
 
@@ -32,8 +36,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItems(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count = 1);
 
+	void InitializeSpace();
+
 protected:
 	TArray<int32> Items;
-
+	
 	virtual void BeginPlay() override;
 };

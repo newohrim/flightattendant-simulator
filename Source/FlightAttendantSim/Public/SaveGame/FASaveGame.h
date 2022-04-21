@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Passengers/PassengerSpawnParams.h"
+#include "Components/ItemsInventoryComponent.h"
 #include "CargoDelivery/CargoInfo.h"
 #include "GameFramework/SaveGame.h"
 #include "FASaveGame.generated.h"
@@ -109,6 +110,18 @@ struct FPlayerData
 	FTransform PlayerTransform;
 };
 
+USTRUCT()
+struct FInventoryItemData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TEnumAsByte<EInventoryItemType> ItemType;
+
+	UPROPERTY()
+	int32 Count = 0;
+};
+
 /**
  * 
  */
@@ -141,6 +154,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Cargoes)
 	TArray<FCargoData> AvailableCargoes;
+
+	UPROPERTY(VisibleAnywhere, Category = Inventory)
+	TArray<FInventoryItemData> PlayerInventory;
 
 	UPROPERTY(VisibleAnywhere, Category = SpacePlane)
 	FSpacePlaneData SpacePlaneData;

@@ -65,6 +65,14 @@ private:
 		TArray<FPassengerData>& FromList,
 		const UFASaveGame* SaveGame);
 
+	static void PopulateInventory(
+		const UItemsInventoryComponent* ItemsInventory,
+		UFASaveGame* SaveGame);
+
+	static void GatherInventory(
+		UItemsInventoryComponent* ItemsInventory,
+		const UFASaveGame* SaveGame);
+
 public:
 	UMapNode* ReconstructWorldMap(
 		const FMapNodeData& NodeData,

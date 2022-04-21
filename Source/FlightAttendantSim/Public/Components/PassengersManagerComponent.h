@@ -63,6 +63,8 @@ protected:
 	int32 PassengerTicketPrice = 15;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Passengers Economics")
 	int32 PassengerServePrice = 5;
+	UPROPERTY(EditDefaultsOnly)
+	FText SuspendMessageTemplate;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<AFABasePassenger*> SpawnedPassengers;

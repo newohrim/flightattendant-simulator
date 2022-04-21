@@ -40,7 +40,7 @@ void UActionExecutorComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!IsPaused)
+	if (!IsPaused && Actions.IsValidIndex(ActiveIndex))
 		Actions[ActiveIndex]->TickAction(DeltaTime, LinkedCharacter);
 }
 

@@ -124,6 +124,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool LoadSucceeded = true;
+	UPROPERTY(BlueprintReadOnly)
+	TArray<AFABaseCharacter*> SpawnedCharacters;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UFlightControlComponent> DefaultFlightControllerClass;
@@ -193,9 +195,6 @@ protected:
 	void SpaceShipBrokenHandle();
 
 private:
-	UPROPERTY()
-	TArray<AFABaseCharacter*> SpawnedCharacters;
-
 	void AddTakenQuest(UQuest* TakenQuest);
 	void RemoveFinishedQuest(UQuest* FinishedQuest);
 };
