@@ -8,12 +8,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad921b8c-7457-4508-967e-f4d754f2a199" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.FlightAttendantSim.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FlightAttendantSim.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/LevelGeneration/BP_LevelGenerator.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LevelGeneration/BP_LevelGenerator.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/LevelGeneration/BP_MainStation.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LevelGeneration/BP_MainStation.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/MiniGames/BP_TubeSystem.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/MiniGames/BP_TubeSystem.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/MiniGames/BP_WireSystem.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/MiniGames/BP_WireSystem.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/Shop/BP_Shop.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/Shop/BP_Shop.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/BP_BaseRepairWorker.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/BP_BaseRepairWorker.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/DocumentsCheckOld/BP_CameraTracerComponent.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/DocumentsCheckOld/BP_CameraTracerComponent.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/FirstPersonBP/Blueprints/FirstPersonCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/FirstPersonBP/Blueprints/FirstPersonCharacter.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Levels/MainLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Levels/MainLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/BP_Lamp.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/BP_Lamp.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/BP_SpaceShip.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/BP_SpaceShip.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/SpaceShip/BP_SpaceShipDoor.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/BP_SpaceShipDoor.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/Doors/BP_DoorWay.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/Doors/BP_DoorWay.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/Geometry/Material.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/Geometry/Material.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/Geometry/barkas1.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/Geometry/barkas1.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/MainCell/BP_PassengersSeat.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/MainCell/BP_PassengersSeat.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/MainCell/BP_PlaneDoorButton.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/MainCell/BP_PlaneDoorButton.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/SpaceShip/PilotCockpit/BP_ControlTable.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/SpaceShip/PilotCockpit/BP_ControlTable.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/StarterBundle/ModularScifiProps/Materials/MI_Base_Light.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/StarterBundle/ModularScifiProps/Materials/MI_Base_Light.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/FlightAttendantSim/Private/Characters/FABaseCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/FlightAttendantSim/Private/Characters/FABaseCharacter.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +107,7 @@
       <workItem from="1650465303776" duration="71000" />
       <workItem from="1650465460560" duration="13000" />
       <workItem from="1650465564952" duration="974000" />
+      <workItem from="1650560687643" duration="2480000" />
     </task>
     <servers />
   </component>
