@@ -9,6 +9,7 @@
 #include "Flight/FlightControlComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "FAGameMode.h"
+#include "Quests/Quest.h"
 #include "Components/WaypointsComponent.h"
 #include "Components/GameEconomyComponent.h"
 #include "SpacePlane/SpacePlaneComponent.h"
@@ -173,6 +174,8 @@ void UPassengersManagerComponent::ExecutePenalties() const
 void UPassengersManagerComponent::PassengersLeavePlane(const UMapNode* Destination)
 {
 	const AFAGameMode* GameMode = FAGAMEMODE;
+	if (GameMode->GetQuestFromClass(QuestToIgnore)->QuestStatus == EQuestStatus::Taken)
+		return;
 	const UWaypointsComponent* Waypoints = GameMode->GetWaypointsComponent();
 	USpacePlaneComponent* SpacePlane = GameMode->GetSpacePlane();
 	int64 TransitPayment = 0;

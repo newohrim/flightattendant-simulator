@@ -14,7 +14,7 @@ UItemsInventoryComponent::UItemsInventoryComponent()
 	// ...
 }
 
-inline int32 UItemsInventoryComponent::GetItemsCount(const TEnumAsByte<EInventoryItemType> ItemType) const
+int32 UItemsInventoryComponent::GetItemsCount(const TEnumAsByte<EInventoryItemType> ItemType) const
 {
 	if (Items.IsValidIndex(ItemType))
 	{
@@ -24,7 +24,7 @@ inline int32 UItemsInventoryComponent::GetItemsCount(const TEnumAsByte<EInventor
 	return 0;
 }
 
-inline void UItemsInventoryComponent::AddItem(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count)
+void UItemsInventoryComponent::AddItem(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count)
 {
 	if (Items.IsValidIndex(ItemType) && Count > 0)
 	{
@@ -32,7 +32,7 @@ inline void UItemsInventoryComponent::AddItem(const TEnumAsByte<EInventoryItemTy
 	}
 }
 
-inline bool UItemsInventoryComponent::RemoveItems(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count)
+bool UItemsInventoryComponent::RemoveItems(const TEnumAsByte<EInventoryItemType> ItemType, const int32 Count)
 {
 	if (Items.IsValidIndex(ItemType) && (Count > 0) && (Items[ItemType] - Count >= 0))
 	{

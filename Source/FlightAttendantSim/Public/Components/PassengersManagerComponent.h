@@ -11,6 +11,7 @@
 class AFABasePassenger;
 class ULocationInfo;
 class UMapNode;
+class UQuest;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FLIGHTATTENDANTSIM_API UPassengersManagerComponent : public UActorComponent
@@ -35,6 +36,8 @@ public:
 	void ClearRedundantPassengers();
 
 protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UQuest> QuestToIgnore;
 	UPROPERTY(EditDefaultsOnly, Category = "FilePaths")
 	FString PathToLastNames;
 	UPROPERTY(EditDefaultsOnly, Category = "FilePaths")

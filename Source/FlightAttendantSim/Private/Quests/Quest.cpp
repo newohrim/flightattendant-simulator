@@ -89,7 +89,7 @@ void UQuest::FinishQuest()
 		return;
 	Cast<AFAGameMode>(World->GetAuthGameMode())->RemoveFinishedQuest(this);
 	*/
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Quest completed."));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Quest completed."));
 	QuestFinished.Broadcast(this);
 }
 

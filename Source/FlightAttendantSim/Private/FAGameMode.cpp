@@ -436,6 +436,8 @@ void AFAGameMode::FillPassengers()
 		DebugPassengersSpawnLocations.Num());
 	const TArray<UMapNode*> AccessibleNodes =
 		WorldMap->GetCurrentNode()->GetAccessibleNodes();
+	if (AccessibleNodes.Num() == 0)
+		return;
 	for (int i = 0; i < PassengersNum; ++i)
 	{
 		ULocationInfo* Destination =
@@ -484,7 +486,6 @@ void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitia
 			SpawnedCharacters.Add(Cast<AFABaseCharacter>(SpawnedCharacter));
 		}
 	}
-	UE_LOG(LogTemp, Display, TEXT("%d"), LoadSucceeded);
 	if (!LoadSucceeded)
 	{
 		FillPassengers();
