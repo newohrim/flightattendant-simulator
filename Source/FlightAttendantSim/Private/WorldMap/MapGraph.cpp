@@ -32,6 +32,7 @@ void UMapGraph::GenerateMap(int32 Depth, const TArray<UQuest*>& QuestsToPlace)
 	ULocationInfo* RootLocation = NewObject<ULocationInfo>(this);
 	RootLocation->CorrespondingNode = RootNode;
 	RootLocation->LocationName = FText::FromString("RootStation");
+	RootLocation->Facilities = { EFacilityType::Shop };
 	RootNode->SetLocationInfo(RootLocation);
 	ExpandNode(RootNode, QuestsToPlace);
 	//RootNode->GenerateChildrenNodes(MaxChildrenNodesNum, MaxFacilitiesNum);

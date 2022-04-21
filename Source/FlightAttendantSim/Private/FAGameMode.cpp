@@ -161,10 +161,6 @@ void AFAGameMode::PostLoadInitialization()
 {
 	LocationGenerator = GetWorld()
 		->SpawnActor(DefaultLocationGeneratorClass, &FTransform::Identity);
-	LocationGenerator->Execute_EmptyLocation(LocationGenerator.GetObject());
-	LocationGenerator->Execute_GenerateLocation(
-		LocationGenerator.GetObject(),
-		WorldMap->GetCurrentNode()->GetLocationInfo());
 	ChangeLocation(WorldMap->GetCurrentNode(), true);
 	if (LoadSucceeded)
 	{
@@ -276,6 +272,10 @@ void AFAGameMode::ChangeLocation(const UMapNode* TargetLocation, const bool IsIn
 {
 	// EMPTY LOCATION
 	EmptyLocation();
+
+	LocationGenerator->Execute_GenerateLocation(
+			LocationGenerator.GetObject(),
+			WorldMap->GetCurrentNode()->GetLocationInfo());
 	
 	// SPAWN NEW CHARACTERS
 	SpawnNewCharacters(TargetLocation, IsInitial);
@@ -461,6 +461,7 @@ void AFAGameMode::EmptyLocation()
 	}
 	SpawnedCharacters.Empty();
 	PassengersManager->ClearRedundantPassengers();
+	LocationGenerator->Execute_EmptyLocation(LocationGenerator.GetObject());
 }
 
 void AFAGameMode::SpawnNewCharacters(const UMapNode* NodeTravelTo, bool IsInitial)
